@@ -34,6 +34,20 @@
             Vek = vek;
             Vyska = vyska;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Lezec other)
+            {
+                return Jmeno == other.Jmeno && Vek == other.Vek && Vyska == other.Vyska;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Jmeno, Vek, Vyska);
+        }
     }
 
     // Potomek třída pro děti
@@ -47,6 +61,20 @@
         {
             JmenoZakonnehoZastupce = jmenoZZ;
             Souhlas = souhlas;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Dite other && base.Equals(other))
+            {
+                return JmenoZakonnehoZastupce == other.JmenoZakonnehoZastupce && Souhlas == other.Souhlas;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(base.GetHashCode(), JmenoZakonnehoZastupce, Souhlas);
         }
     }
 
@@ -93,10 +121,17 @@
             // Načtení lezců ze souboru
             List<Lezec> lezci = NactiLezce(lezciFilePath);
 
-            // Ukázka přidání lezců do seznamu
-            lezci.Add(new Lezec("Jan", 25, 175));
-            lezci.Add(new Lezec("Alice", 30, 160));
-            lezci.Add(new Dite("Peta", 13, 152, "Petr Novák", true));
+            // Přidání lezců do seznamu jen, pokud už tam neexistují
+            Lezec lezec1 = new Lezec("Jan", 25, 175);
+            Lezec lezec2 = new Lezec("Alice", 30, 160);
+            Lezec lezec3 = new Dite("Peta", 13, 152, "Petr Novák", true);
+            Lezec lezec4 = new Dite("Myska", 10, 140, "Michaela Perná", true);
+
+            PridatLezcePokudNeexistuje(lezci, lezec1);
+            PridatLezcePokudNeexistuje(lezci, lezec2);
+            PridatLezcePokudNeexistuje(lezci, lezec3);
+            PridatLezcePokudNeexistuje(lezci, lezec4);
+
 
             // Vytvoření lezeckých tras
             LezeckaTrasa trasa1 = new LezeckaTrasa("Trasa A", "Autor 1", Obtiznost.B4b, 15);
@@ -157,6 +192,14 @@
             }
 
             File.WriteAllLines(lezciFilePath, lines);
+        }
+
+        static void PridatLezcePokudNeexistuje(List<Lezec> lezci, Lezec novyLezec)
+        {
+            if (!lezci.Contains(novyLezec))
+            {
+                lezci.Add(novyLezec);
+            }
         }
     }
 }
