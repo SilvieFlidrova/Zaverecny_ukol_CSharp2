@@ -1,7 +1,5 @@
 ﻿namespace Lezecka_stena_evidence
 {
-    // evidence lezců, cest a pokusů o zdolání
-
     // Výčtový typ pro obtížnost lezeckých cest
     public enum Obtiznost
     { B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a, B7b };
@@ -38,8 +36,7 @@
         }
     }
 
-
-    // Potomek třída pro nezlelezce             podminka pro zapsani pokusu vysloveny souhlas ZZ?
+    // Potomek třída pro děti
     public class Dite : Lezec
     {
         public string JmenoZakonnehoZastupce { get; set; }
@@ -52,7 +49,6 @@
             Souhlas = souhlas;
         }
     }
-
 
     // Třída pro evidenci lezeckých tras a lezců
     public class EvidencniZaznam
@@ -92,10 +88,15 @@
     {
         static void Main(string[] args)
         {
-            // Vytvoření lezců
-            Lezec lezec1 = new Lezec("Jan", 25, 175);
-            Lezec lezec2 = new Lezec("Alice", 30, 160);
-            Lezec lezec3 = new Dite("Peta", 13, 152, "Petr Novák", true);
+            string lezciFilePath = "SeznamLezcu.csv";
+
+            // Načtení lezců ze souboru
+            List<Lezec> lezci = NactiLezce(lezciFilePath);
+
+            // Ukázka přidání lezců do seznamu
+            lezci.Add(new Lezec("Jan", 25, 175));
+            lezci.Add(new Lezec("Alice", 30, 160));
+            lezci.Add(new Dite("Peta", 13, 152, "Petr Novák", true));
 
             // Vytvoření lezeckých tras
             LezeckaTrasa trasa1 = new LezeckaTrasa("Trasa A", "Autor 1", Obtiznost.B4b, 15);
@@ -105,12 +106,58 @@
             EvidencniZaznam evidencniZaznam = new EvidencniZaznam();
 
             // Přidání záznamů do evidence
-            evidencniZaznam.PridejEvidencniZaznam(lezec1, trasa1, DateTime.Now, true);
-            evidencniZaznam.PridejEvidencniZaznam(lezec2, trasa1, DateTime.Now, false);
-            evidencniZaznam.PridejEvidencniZaznam(lezec1, trasa2, DateTime.Now, true);
+            evidencniZaznam.PridejEvidencniZaznam(lezci[0], trasa1, DateTime.Now, true);
+            evidencniZaznam.PridejEvidencniZaznam(lezci[1], trasa1, DateTime.Now, false);
+            evidencniZaznam.PridejEvidencniZaznam(lezci[0], trasa2, DateTime.Now, true);
 
             // Zobrazení evidence
             evidencniZaznam.ZobrazEvidencniZaznamy();
+
+            // Uložení seznamu lezců do souboru
+            UlozLezce(lezciFilePath, lezci);
+        }
+
+        static List<Lezec> NactiLezce(string lezciFilePath)
+        {
+            List<Lezec> lezci = new List<Lezec>();
+
+            if (File.Exists(lezciFilePath))
+            {
+                foreach (var line in File.ReadAllLines(lezciFilePath))
+                {
+                    var parts = line.Split(';');
+                    if (parts.Length == 3) // Lezec
+                    {
+                        lezci.Add(new Lezec(parts[0], int.Parse(parts[1]), double.Parse(parts[2])));
+                    }
+                    else if (parts.Length == 5) // Dite
+                    {
+                        lezci.Add(new Dite(parts[0], int.Parse(parts[1]), double.Parse(parts[2]), parts[3], bool.Parse(parts[4])));
+                    }
+                }
+            }
+
+            return lezci;
+        }
+
+        static void UlozLezce(string lezciFilePath, List<Lezec> lezci)
+        {
+            List<string> lines = new List<string>();
+
+            foreach (var lezec in lezci)
+            {
+                if (lezec is Dite dite)
+                {
+                    lines.Add($"{dite.Jmeno};{dite.Vek};{dite.Vyska};{dite.JmenoZakonnehoZastupce};{dite.Souhlas}");
+                }
+                else
+                {
+                    lines.Add($"{lezec.Jmeno};{lezec.Vek};{lezec.Vyska}");
+                }
+            }
+
+            File.WriteAllLines(lezciFilePath, lines);
         }
     }
 }
+
