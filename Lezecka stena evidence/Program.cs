@@ -1,4 +1,5 @@
-﻿using System.Data.SqlTypes;
+﻿using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -173,8 +174,39 @@ namespace Lezecka_stena_evidence
             File.WriteAllLines(lezciFilePath, lines);
         }
 
-              
-        public static void PridatLezcePokudNeexistuje(List<Lezec> lezci, Lezec novyLezec)
+        public static void PridejLezceZKonzole(List<Lezec> lezci)
+        {
+            Console.Write("Zadejte jméno lezce: ");
+            string jmeno = Console.ReadLine();
+
+            Console.Write("Zadejte datum narození lezce (dd.MM.yyyy): ");
+            string datumNarozeni = Console.ReadLine();
+
+            Console.Write("Zadejte výšku lezce (v cm): ");
+            double vyska = double.Parse(Console.ReadLine());
+
+            DateTime datumNarozeniDate = DateTime.ParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+            Lezec novyLezec;
+
+            if ((DateTime.Now - datumNarozeniDate).TotalDays / 365.25 < 18)
+            {
+                Console.Write("Zadejte jméno zákonného zástupce: ");
+                string jmenoZakonnehoZastupce = Console.ReadLine();
+
+                Console.Write("Souhlasí zákonný zástupce? (true/false): ");
+                bool souhlas = bool.Parse(Console.ReadLine());
+
+                novyLezec = new Dite(jmeno, datumNarozeni, vyska, jmenoZakonnehoZastupce, souhlas);
+            }
+            else
+            {
+                novyLezec = new Lezec(jmeno, datumNarozeni, vyska);
+            }
+            
+            PridatLezcePokudNeexistuje(lezci, novyLezec);
+           
+        }
+            public static void PridatLezcePokudNeexistuje(List<Lezec> lezci, Lezec novyLezec)
         {
             if (!lezci.Contains(novyLezec))
             {
@@ -206,13 +238,13 @@ namespace Lezecka_stena_evidence
             //  EvidencniZaznam evidencniZaznam = EvidencniSystem.NactiEvidencniZaznamy("evidencePokusu.csv", lezci, trasy);
 
             Console.WriteLine("Vítej v evidenčním systému lezeckých tras a lezců");
-            Console.WriteLine("Můžete editovat seznamy nebo požádat o výpis statistiky.");
-            Console.WriteLine($"Pokud budete chctít činnost ukončit, zadejte X.");
+            Console.WriteLine("Můžeš editovat seznamy nebo požádat o výpis statistiky.");
+            Console.WriteLine($"Pokud budeš chtít činnost ukončit, zadej X.");
 
 
             while (true)
             {
-                Console.WriteLine("Chcete upravovat seznamy nebo zobrazit statistiku? (1 = seznamy, 2 = statistika, X = konec)");
+                Console.WriteLine("Chceš upravovat seznamy nebo zobrazit statistiku? (1 = seznamy, 2 = statistika, X = konec)");
                 string volbaZákladní = Console.ReadLine();
 
                 if (volbaZákladní == "X")
@@ -221,7 +253,7 @@ namespace Lezecka_stena_evidence
                 }
                 else if (volbaZákladní == "1") //upravuji seznamy
                 {
-                    Console.WriteLine($"V rámci práce se záznamy můžete pracovat se seznamem lezců (1), seznamem lezeckých tras(2) nebo evidencí lezeckých pokusů(3):");
+                    Console.WriteLine($"V rámci práce se záznamy můžeš pracovat se seznamem lezců (1), seznamem lezeckých tras(2) nebo evidencí lezeckých pokusů(3):");
                     string volbaSeznamu = Console.ReadLine();
                     if (volbaSeznamu == "X")
                     {
@@ -230,6 +262,8 @@ namespace Lezecka_stena_evidence
                     else if (volbaSeznamu == "1")   //lezci
                     {
                         EvidencniSystem.DejNaVyber();
+                        EvidencniSystem.PridejLezceZKonzole(lezci);
+                        break;
                         
                     }
                     else if (volbaSeznamu == "2")   //trasy
@@ -247,6 +281,7 @@ namespace Lezecka_stena_evidence
                         Console.WriteLine("Neplatný výběr.");
                         break;
                     }
+                    break;
 
                 }
                 else if (volbaZákladní == "2") //zobrazuji statistiky 
@@ -259,6 +294,8 @@ namespace Lezecka_stena_evidence
                     Console.WriteLine("Neplatný výběr.");
                     break;
                 }
+
+                EvidencniSystem.UlozLezce(lezciFilePath, lezci);
             }
 
 
