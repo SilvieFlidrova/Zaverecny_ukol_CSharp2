@@ -35,6 +35,7 @@
             Vyska = vyska;
         }
 
+        // ko unikatnosti
         public override bool Equals(object obj)
         {
             if (obj is Lezec other)
@@ -63,7 +64,8 @@
             Souhlas = souhlas;
         }
 
-        public override bool Equals(object obj)
+        // ko unikatnosti
+        public override bool Equals(object obj)         
         {
             if (obj is Dite other && base.Equals(other))
             {
@@ -125,7 +127,7 @@
             Lezec lezec1 = new Lezec("Jan", 25, 175);
             Lezec lezec2 = new Lezec("Alice", 30, 160);
             Lezec lezec3 = new Dite("Peta", 13, 152, "Petr Novák", true);
-            Lezec lezec4 = new Dite("Myska", 10, 140, "Michaela Perná", true);
+            Lezec lezec4 = new Dite("Kubik", 5, 104, "Michaela Perná", true);
 
             PridatLezcePokudNeexistuje(lezci, lezec1);
             PridatLezcePokudNeexistuje(lezci, lezec2);
@@ -161,11 +163,11 @@
                 foreach (var line in File.ReadAllLines(lezciFilePath))
                 {
                     var parts = line.Split(';');
-                    if (parts.Length == 3) // Lezec
+                    if (int.Parse(parts[1]) >= 18) // Lezec
                     {
                         lezci.Add(new Lezec(parts[0], int.Parse(parts[1]), double.Parse(parts[2])));
                     }
-                    else if (parts.Length == 5) // Dite
+                    else // Dite
                     {
                         lezci.Add(new Dite(parts[0], int.Parse(parts[1]), double.Parse(parts[2]), parts[3], bool.Parse(parts[4])));
                     }
