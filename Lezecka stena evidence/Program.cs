@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System.Data.SqlTypes;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace Lezecka_stena_evidence
 {
@@ -41,7 +43,7 @@ namespace Lezecka_stena_evidence
         {
             DateTime dnes = DateTime.Now;
             TimeSpan vekSpan = dnes - DatumNarozeni;
-            return vekSpan.TotalDays / 365.25;
+            return (Math.Floor(vekSpan.TotalDays / 365.25));
         }
 
 
@@ -171,12 +173,21 @@ namespace Lezecka_stena_evidence
             File.WriteAllLines(lezciFilePath, lines);
         }
 
+              
         public static void PridatLezcePokudNeexistuje(List<Lezec> lezci, Lezec novyLezec)
         {
             if (!lezci.Contains(novyLezec))
             {
                 lezci.Add(novyLezec);
             }
+        }
+
+        
+        public static string DejNaVyber()
+        {
+            Console.WriteLine($"Můžeš záznam přidat(1), záznam editovat(2) nebo záznam smazat(3):");
+            string volbaUkonu = Console.ReadLine();
+            return volbaUkonu;
         }
     }
 
@@ -191,7 +202,65 @@ namespace Lezecka_stena_evidence
             // Načtení lezců ze souboru
             List<Lezec> lezci = EvidencniSystem.NactiLezce(lezciFilePath);
 
-            // Načtení seznamu tars a evidence pokusů
+            //  List<LezeckaTrasa> trasy = EvidencniSystem.NactiTrasy("seznamTras.csv");
+            //  EvidencniZaznam evidencniZaznam = EvidencniSystem.NactiEvidencniZaznamy("evidencePokusu.csv", lezci, trasy);
+
+            Console.WriteLine("Vítej v evidenčním systému lezeckých tras a lezců");
+            Console.WriteLine("Můžete editovat seznamy nebo požádat o výpis statistiky.");
+            Console.WriteLine($"Pokud budete chctít činnost ukončit, zadejte X.");
+
+
+            while (true)
+            {
+                Console.WriteLine("Chcete upravovat seznamy nebo zobrazit statistiku? (1 = seznamy, 2 = statistika, X = konec)");
+                string volbaZákladní = Console.ReadLine();
+
+                if (volbaZákladní == "X")
+                {
+                    return;
+                }
+                else if (volbaZákladní == "1") //upravuji seznamy
+                {
+                    Console.WriteLine($"V rámci práce se záznamy můžete pracovat se seznamem lezců (1), seznamem lezeckých tras(2) nebo evidencí lezeckých pokusů(3):");
+                    string volbaSeznamu = Console.ReadLine();
+                    if (volbaSeznamu == "X")
+                    {
+                        return;
+                    }
+                    else if (volbaSeznamu == "1")   //lezci
+                    {
+                        EvidencniSystem.DejNaVyber();
+                        
+                    }
+                    else if (volbaSeznamu == "2")   //trasy
+                    {
+                        EvidencniSystem.DejNaVyber();
+
+                    }
+                    else if (volbaSeznamu == "3")   //pokusy
+                    {
+                        EvidencniSystem.DejNaVyber();
+
+                    }
+                    else 
+                    {
+                        Console.WriteLine("Neplatný výběr.");
+                        break;
+                    }
+
+                }
+                else if (volbaZákladní == "2") //zobrazuji statistiky 
+                {
+
+                }
+
+                else
+                {
+                    Console.WriteLine("Neplatný výběr.");
+                    break;
+                }
+            }
+
 
 
 
