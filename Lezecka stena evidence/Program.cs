@@ -212,6 +212,11 @@ namespace Lezecka_stena_evidence
             {
                 lezci.Add(novyLezec);
             }
+            else
+            {
+                Console.WriteLine("Tento lezec už je v systemu zaevidovany.");
+
+            }
         }
 
         
@@ -241,8 +246,8 @@ namespace Lezecka_stena_evidence
             Console.WriteLine("Můžeš editovat seznamy nebo požádat o výpis statistiky.");
             Console.WriteLine($"Pokud budeš chtít činnost ukončit, zadej X.");
 
-
-            while (true)
+            bool maBezetProgram = true;
+            while (maBezetProgram)
             {
                 Console.WriteLine("Chceš upravovat seznamy nebo zobrazit statistiku? (1 = seznamy, 2 = statistika, X = konec)");
                 string volbaZákladní = Console.ReadLine();
@@ -257,7 +262,8 @@ namespace Lezecka_stena_evidence
                     string volbaSeznamu = Console.ReadLine();
                     if (volbaSeznamu == "X")
                     {
-                        return;
+                        maBezetProgram = false;
+                        break;
                     }
                     else if (volbaSeznamu == "1")   //lezci
                     {
@@ -281,7 +287,7 @@ namespace Lezecka_stena_evidence
                         Console.WriteLine("Neplatný výběr.");
                         break;
                     }
-                    break;
+                    EvidencniSystem.UlozLezce(lezciFilePath, lezci);
 
                 }
                 else if (volbaZákladní == "2") //zobrazuji statistiky 
@@ -296,6 +302,7 @@ namespace Lezecka_stena_evidence
                 }
 
                 EvidencniSystem.UlozLezce(lezciFilePath, lezci);
+
             }
 
 
