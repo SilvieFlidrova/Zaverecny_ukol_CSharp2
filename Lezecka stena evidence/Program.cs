@@ -111,55 +111,10 @@ namespace Lezecka_stena_evidence
         }
     }
 
-    class Program
+
+    public class EvidencniSystem
     {
-        static void Main(string[] args)
-        {
-            string lezciFilePath = "SeznamLezcu.csv";
-            string trasyFilePath = "SeznamTras.csv";
-            string evidenceFilePath = "EvidencePokusu.csv";
-
-            // Načtení lezců ze souboru
-            List<Lezec> lezci = NactiLezce(lezciFilePath);
-
-            // Načtení seznamu tars a evidence pokusů
-
-
-
-            // Přidání lezců do seznamu jen, pokud už tam neexistují
-            Lezec lezec1 = new Lezec("Jan", "15.04.1995", 175);
-            Lezec lezec2 = new Lezec("Alice", "23.08.1990", 160);
-            Lezec lezec3 = new Dite("Peta", "12.11.2010", 152, "Petr Novák", true);
-            Lezec lezec4 = new Dite("Peta", "12.11.2010", 152, "Petr Novák", true);
-
-            PridatLezcePokudNeexistuje(lezci, lezec1);
-            PridatLezcePokudNeexistuje(lezci, lezec2);
-            PridatLezcePokudNeexistuje(lezci, lezec3);
-            PridatLezcePokudNeexistuje(lezci, lezec4);
-
-            // vypis seznamu lezců do konzole
-            VypisLezce(lezci);
-
-            // Vytvoření lezeckých tras
-            LezeckaTrasa trasa1 = new LezeckaTrasa("Trasa A", "Autor 1", Obtiznost.B4b, 15);
-            LezeckaTrasa trasa2 = new LezeckaTrasa("Trasa B", "Autor 2", Obtiznost.B5b, 14.5);
-
-            // Vytvoření evidence
-            EvidencniZaznam evidencniZaznam = new EvidencniZaznam();
-
-            // Přidání záznamů do evidence
-            evidencniZaznam.PridejEvidencniZaznam(lezci[0], trasa1, DateTime.Now, true);
-            evidencniZaznam.PridejEvidencniZaznam(lezci[1], trasa1, DateTime.Now, false);
-            evidencniZaznam.PridejEvidencniZaznam(lezci[0], trasa2, DateTime.Now, true);
-
-            // Zobrazení evidence
-            evidencniZaznam.ZobrazEvidencniZaznamy();
-
-            // Uložení seznamu lezců do souboru
-            UlozLezce(lezciFilePath, lezci);
-        }
-
-        static List<Lezec> NactiLezce(string lezciFilePath)
+        public static List<Lezec> NactiLezce(string lezciFilePath)
         {
             List<Lezec> lezci = new List<Lezec>();
 
@@ -167,10 +122,8 @@ namespace Lezecka_stena_evidence
             {
                 foreach (var line in File.ReadAllLines(lezciFilePath))
                 {
-                     
                     var parts = line.Split(';');
                     DateTime DatumNarozeni = DateTime.ParseExact(parts[1], "dd.MM.yyyy", CultureInfo.InvariantCulture);
-                    
 
                     if ((DateTime.Now - DatumNarozeni).TotalDays / 365.25 >= 18) // Lezec
                     {
@@ -185,7 +138,8 @@ namespace Lezecka_stena_evidence
 
             return lezci;
         }
-        static void VypisLezce(List<Lezec> lezci)
+
+        public static void VypisLezce(List<Lezec> lezci)
         {
             Console.WriteLine($"Seznam lezců:");
             foreach (var lezec in lezci)
@@ -197,7 +151,8 @@ namespace Lezecka_stena_evidence
                 }
             }
         }
-        static void UlozLezce(string lezciFilePath, List<Lezec> lezci)
+
+        public static void UlozLezce(string lezciFilePath, List<Lezec> lezci)
         {
             List<string> lines = new List<string>();
 
@@ -216,13 +171,64 @@ namespace Lezecka_stena_evidence
             File.WriteAllLines(lezciFilePath, lines);
         }
 
-        static void PridatLezcePokudNeexistuje(List<Lezec> lezci, Lezec novyLezec)
+        public static void PridatLezcePokudNeexistuje(List<Lezec> lezci, Lezec novyLezec)
         {
             if (!lezci.Contains(novyLezec))
             {
                 lezci.Add(novyLezec);
             }
         }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string lezciFilePath = "SeznamLezcu.csv";
+            string trasyFilePath = "SeznamTras.csv";
+            string evidenceFilePath = "EvidencePokusu.csv";
+
+            // Načtení lezců ze souboru
+            List<Lezec> lezci = EvidencniSystem.NactiLezce(lezciFilePath);
+
+            // Načtení seznamu tars a evidence pokusů
+
+
+
+            // Přidání lezců do seznamu jen, pokud už tam neexistují
+            Lezec lezec1 = new Lezec("Jan", "15.04.1995", 175);
+            Lezec lezec2 = new Lezec("Alice", "23.08.1990", 160);
+            Lezec lezec3 = new Dite("Peta", "12.11.2010", 152, "Petr Novák", true);
+            Lezec lezec4 = new Dite("Peta", "12.11.2010", 152, "Petr Novák", true);
+
+            EvidencniSystem.PridatLezcePokudNeexistuje(lezci, lezec1);
+            EvidencniSystem.PridatLezcePokudNeexistuje(lezci, lezec2);
+            EvidencniSystem.PridatLezcePokudNeexistuje(lezci, lezec3);
+            EvidencniSystem.PridatLezcePokudNeexistuje(lezci, lezec4);
+
+            // vypis seznamu lezců do konzole
+            EvidencniSystem.VypisLezce(lezci);
+
+            // Vytvoření lezeckých tras
+            LezeckaTrasa trasa1 = new LezeckaTrasa("Trasa A", "Autor 1", Obtiznost.B4b, 15);
+            LezeckaTrasa trasa2 = new LezeckaTrasa("Trasa B", "Autor 2", Obtiznost.B5b, 14.5);
+
+            // Vytvoření evidence
+            EvidencniZaznam evidencniZaznam = new EvidencniZaznam();
+
+            // Přidání záznamů do evidence
+            evidencniZaznam.PridejEvidencniZaznam(lezci[0], trasa1, DateTime.Now, true);
+            evidencniZaznam.PridejEvidencniZaznam(lezci[1], trasa1, DateTime.Now, false);
+            evidencniZaznam.PridejEvidencniZaznam(lezci[0], trasa2, DateTime.Now, true);
+
+            // Zobrazení evidence
+            evidencniZaznam.ZobrazEvidencniZaznamy();
+
+            // Uložení seznamu lezců do souboru
+            EvidencniSystem.UlozLezce(lezciFilePath, lezci);
+        }
+
+        
     }
 }
 
