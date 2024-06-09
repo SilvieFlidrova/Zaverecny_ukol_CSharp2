@@ -299,19 +299,6 @@ namespace Lezecka_stena_evidence
             }
 
 
-
-
-            // Přidání lezců do seznamu jen, pokud už tam neexistují
-            Lezec lezec1 = new Lezec("Jan", "15.04.1995", 175);
-            Lezec lezec2 = new Lezec("Alice", "23.08.1990", 160);
-            Lezec lezec3 = new Dite("Peta", "12.11.2010", 152, "Petr Novák", true);
-            Lezec lezec4 = new Dite("Peta", "12.11.2010", 152, "Petr Novák", true);
-
-            EvidencniSystem.PridatLezcePokudNeexistuje(lezci, lezec1);
-            EvidencniSystem.PridatLezcePokudNeexistuje(lezci, lezec2);
-            EvidencniSystem.PridatLezcePokudNeexistuje(lezci, lezec3);
-            EvidencniSystem.PridatLezcePokudNeexistuje(lezci, lezec4);
-
             // vypis seznamu lezců do konzole
             EvidencniSystem.VypisLezce(lezci);
 
