@@ -1,4 +1,6 @@
-﻿namespace Lezecka_stena_evidence
+﻿using System.Globalization;
+
+namespace Lezecka_stena_evidence
 {
     // Výčtový typ pro obtížnost lezeckých cest
     public enum Obtiznost
@@ -25,29 +27,38 @@
     public class Lezec
     {
         public string Jmeno { get; set; }
-        public int Vek { get; set; }
+        public DateTime DatumNarozeni { get; set; }
         public double Vyska { get; set; }
 
-        public Lezec(string jmeno, int vek, double vyska)
+        public Lezec(string jmeno, string datumNarozeni, double vyska)
         {
             Jmeno = jmeno;
-            Vek = vek;
+            DatumNarozeni = DateTime.ParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture);
             Vyska = vyska;
         }
+
+        public double VypocitejVek()
+        {
+            DateTime dnes = DateTime.Now;
+            TimeSpan vekSpan = dnes - DatumNarozeni;
+            return vekSpan.TotalDays / 365.25;
+        }
+
+
 
         // ko unikatnosti
         public override bool Equals(object obj)
         {
             if (obj is Lezec other)
             {
-                return Jmeno == other.Jmeno && Vek == other.Vek && Vyska == other.Vyska;
+                return Jmeno == other.Jmeno && DatumNarozeni == other.DatumNarozeni && Vyska == other.Vyska;
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Jmeno, Vek, Vyska);
+            return HashCode.Combine(Jmeno, DatumNarozeni, Vyska);
         }
     }
 
@@ -57,27 +68,13 @@
         public string JmenoZakonnehoZastupce { get; set; }
         public bool Souhlas { get; set; }
 
-        public Dite(string jmeno, int vek, double vyska, string jmenoZZ, bool souhlas)
-         : base(jmeno, vek, vyska)
+        public Dite(string jmeno, string datumNarozeni, double vyska, string jmenoZZ, bool souhlas)
+         : base(jmeno, datumNarozeni, vyska)
         {
             JmenoZakonnehoZastupce = jmenoZZ;
             Souhlas = souhlas;
         }
 
-        // ko unikatnosti
-        public override bool Equals(object obj)         
-        {
-            if (obj is Dite other && base.Equals(other))
-            {
-                return JmenoZakonnehoZastupce == other.JmenoZakonnehoZastupce && Souhlas == other.Souhlas;
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(base.GetHashCode(), JmenoZakonnehoZastupce, Souhlas);
-        }
     }
 
     // Třída pro evidenci lezeckých tras a lezců
@@ -119,21 +116,29 @@
         static void Main(string[] args)
         {
             string lezciFilePath = "SeznamLezcu.csv";
+            string trasyFilePath = "SeznamTras.csv";
+            string evidenceFilePath = "EvidencePokusu.csv";
 
             // Načtení lezců ze souboru
             List<Lezec> lezci = NactiLezce(lezciFilePath);
 
+            // Načtení seznamu tars a evidence pokusů
+
+
+
             // Přidání lezců do seznamu jen, pokud už tam neexistují
-            Lezec lezec1 = new Lezec("Jan", 25, 175);
-            Lezec lezec2 = new Lezec("Alice", 30, 160);
-            Lezec lezec3 = new Dite("Peta", 13, 152, "Petr Novák", true);
-            Lezec lezec4 = new Dite("Kubik", 5, 104, "Michaela Perná", true);
+            Lezec lezec1 = new Lezec("Jan", "15.04.1995", 175);
+            Lezec lezec2 = new Lezec("Alice", "23.08.1990", 160);
+            Lezec lezec3 = new Dite("Peta", "12.11.2010", 152, "Petr Novák", true);
+            Lezec lezec4 = new Dite("Peta", "12.11.2010", 152, "Petr Novák", true);
 
             PridatLezcePokudNeexistuje(lezci, lezec1);
             PridatLezcePokudNeexistuje(lezci, lezec2);
             PridatLezcePokudNeexistuje(lezci, lezec3);
             PridatLezcePokudNeexistuje(lezci, lezec4);
 
+            // vypis seznamu lezců do konzole
+            VypisLezce(lezci);
 
             // Vytvoření lezeckých tras
             LezeckaTrasa trasa1 = new LezeckaTrasa("Trasa A", "Autor 1", Obtiznost.B4b, 15);
@@ -162,21 +167,36 @@
             {
                 foreach (var line in File.ReadAllLines(lezciFilePath))
                 {
+                     
                     var parts = line.Split(';');
-                    if (int.Parse(parts[1]) >= 18) // Lezec
+                    DateTime DatumNarozeni = DateTime.ParseExact(parts[1], "dd.MM.yyyy", CultureInfo.InvariantCulture);
+                    
+
+                    if ((DateTime.Now - DatumNarozeni).TotalDays / 365.25 >= 18) // Lezec
                     {
-                        lezci.Add(new Lezec(parts[0], int.Parse(parts[1]), double.Parse(parts[2])));
+                        lezci.Add(new Lezec(parts[0], (parts[1]), double.Parse(parts[2])));
                     }
                     else // Dite
                     {
-                        lezci.Add(new Dite(parts[0], int.Parse(parts[1]), double.Parse(parts[2]), parts[3], bool.Parse(parts[4])));
+                        lezci.Add(new Dite(parts[0], (parts[1]), double.Parse(parts[2]), parts[3], bool.Parse(parts[4])));
                     }
                 }
             }
 
             return lezci;
         }
-
+        static void VypisLezce(List<Lezec> lezci)
+        {
+            Console.WriteLine($"Seznam lezců:");
+            foreach (var lezec in lezci)
+            {
+                Console.WriteLine($"{lezec.Jmeno}, Datum narození: {lezec.DatumNarozeni:dd.MM.yyyy}, Věk: {Math.Floor(lezec.VypocitejVek())} let, Výška: {lezec.Vyska} cm");
+                if (lezec is Dite dite)
+                {
+                    Console.WriteLine($"  Jméno zákonného zástupce: {dite.JmenoZakonnehoZastupce}, Souhlas: {dite.Souhlas}");
+                }
+            }
+        }
         static void UlozLezce(string lezciFilePath, List<Lezec> lezci)
         {
             List<string> lines = new List<string>();
@@ -185,11 +205,11 @@
             {
                 if (lezec is Dite dite)
                 {
-                    lines.Add($"{dite.Jmeno};{dite.Vek};{dite.Vyska};{dite.JmenoZakonnehoZastupce};{dite.Souhlas}");
+                    lines.Add($"{dite.Jmeno};{dite.DatumNarozeni:dd.MM.yyyy};{dite.Vyska};{dite.JmenoZakonnehoZastupce};{dite.Souhlas}");
                 }
                 else
                 {
-                    lines.Add($"{lezec.Jmeno};{lezec.Vek};{lezec.Vyska}");
+                    lines.Add($"{lezec.Jmeno};{lezec.DatumNarozeni:dd.MM.yyyy};{lezec.Vyska}");
                 }
             }
 
