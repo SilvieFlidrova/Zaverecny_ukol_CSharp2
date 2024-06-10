@@ -230,6 +230,48 @@ namespace Lezecka_stena_evidence
             }
         }
 
+        public static void EditovatLezce(List<Lezec> lezci)
+        {
+            Console.Write("Zadej lezce, kterého chceš editovat: ");
+            var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributy();
+            DateTime datumNarozeniDate = DateTime.ParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+
+
+            Lezec lezecKEditaci = lezci.Find(lezec => lezec.Jmeno == jmeno && lezec.DatumNarozeni.ToString("dd.MM.yyyy") == datumNarozeni);
+
+            if (lezecKEditaci != null)
+            {
+                Console.WriteLine($"Lezec nalezen: {lezecKEditaci.Jmeno}, Datum narození: {lezecKEditaci.DatumNarozeni:dd.MM.yyyy}, Výška: {lezecKEditaci.Vyska} cm");
+                if (lezecKEditaci is Dite dite)
+                {
+                    Console.WriteLine($"  Jméno zákonného zástupce: {dite.JmenoZakonnehoZastupce}, Souhlas: {dite.Souhlas}");
+                }
+
+                Console.Write("Chceš změnit výšku? (y/n): ");
+                if (Console.ReadLine().ToLower() == "y")
+                {
+                    Console.Write("Zadej novou výšku (v cm): ");
+                    lezecKEditaci.Vyska = double.Parse(Console.ReadLine());
+                }
+
+                if (lezecKEditaci is Dite diteKEditaci)
+                {
+                    Console.Write("Chceš změnit souhlas zákonného zástupce? (y/n): ");
+                    if (Console.ReadLine().ToLower() == "y")
+                    {
+                        Console.Write("Zadej nový souhlas (true/false): ");
+                        diteKEditaci.Souhlas = bool.Parse(Console.ReadLine());
+                    }
+                }
+
+                Console.WriteLine("Úpravy byly úspěšně provedeny.");
+            }
+            else
+            {
+                Console.WriteLine("Lezec nebyl nalezen.");
+            }
+        }
+
         public static void SmazatLezce(List<Lezec> lezci)
         {
             var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributy();
@@ -297,22 +339,40 @@ namespace Lezecka_stena_evidence
                     }
                     else if (volbaSeznamu == "1")   //lezci
                     {
-                        EvidencniSystem.DejNaVyber();
-                        EvidencniSystem.PridatLezceZKonzole(lezci);
-                        break;
                         
+                        string volbaUkonu = EvidencniSystem.DejNaVyber();
+                        switch(volbaUkonu)
+                        {
+                            case "1":
+                                EvidencniSystem.PridatLezceZKonzole(lezci);
+                                break;
+
+                            case "2":
+                                EvidencniSystem.EditovatLezce(lezci);
+                                break;
+
+                            case "3":
+                                EvidencniSystem.SmazatLezce(lezci);
+                                break;
+
+                            case "X" or "x":
+                               return;
+
+                            default:
+                                break;
+                        }
+                        EvidencniSystem.UlozLezce(lezciFilePath, lezci);
                     }
+
                     else if (volbaSeznamu == "2")   //trasy
                     {
                         EvidencniSystem.DejNaVyber();
-                        EvidencniSystem.PridatLezceZKonzole(lezci);
                         break;
 
                     }
                     else if (volbaSeznamu == "3")   //pokusy
                     {
                         EvidencniSystem.DejNaVyber();
-                        EvidencniSystem.SmazatLezce(lezci);
                         break;
 
                     }
@@ -321,7 +381,6 @@ namespace Lezecka_stena_evidence
                         Console.WriteLine("Neplatný výběr.");
                         break;
                     }
-                    EvidencniSystem.UlozLezce(lezciFilePath, lezci);
 
                 }
                 else if (volbaZákladní == "2") //zobrazuji statistiky 
