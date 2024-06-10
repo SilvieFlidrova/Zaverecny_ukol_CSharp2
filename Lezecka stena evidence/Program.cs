@@ -114,7 +114,7 @@ namespace Lezecka_stena_evidence
             TimeSpan vekSpan = dnes - datumNarozeni;
             return vekSpan.TotalDays / 365.25;
         }
-        public static (string jmeno, string datumNarozeni, double vyska) ZadejZakladniAtributy()
+        public static (string jmeno, string datumNarozeni, double vyska) ZadejZakladniAtributyLezce()
         {
             Console.Write("Zadejte jméno lezce: ");
             string jmeno = Console.ReadLine();
@@ -128,7 +128,7 @@ namespace Lezecka_stena_evidence
             return (jmeno, datumNarozeni, vyska);
         }
 
-        public static (string jmenoZakonnehoZastupce, bool souhlas) ZadejDoplnujiciAtributy()
+        public static (string jmenoZakonnehoZastupce, bool souhlas) ZadejDoplnujiciAtributyLezce()
         {
             Console.Write("Zadejte jméno zákonného zástupce: ");
             string jmenoZakonnehoZastupce = Console.ReadLine();
@@ -139,6 +139,23 @@ namespace Lezecka_stena_evidence
             return (jmenoZakonnehoZastupce, souhlas);
         }
 
+        public static (string nazev, string autor, Obtiznost Obtiznost, double delka) ZadejZakladniAtributyTrasy()
+        {
+            Console.Write("Zadej název trasy: ");
+            string nazev = Console.ReadLine();
+
+            Console.Write("Zadej jméno autora trasy: ");
+            string autor = Console.ReadLine();
+
+            Console.Write("Zadej obtížnost trasy (B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a nebo B7b): ");
+            Obtiznost obtiznost = (Obtiznost)Enum.Parse(typeof(Obtiznost), Console.ReadLine());
+
+            Console.Write("Zadej délku trasy (v m): ");
+
+            double delka = double.Parse(Console.ReadLine());
+
+            return (nazev, autor, obtiznost, delka);
+        }
 
         public static List<Lezec> NactiLezce(string lezciFilePath)
         {
@@ -199,13 +216,13 @@ namespace Lezecka_stena_evidence
 
         public static void PridatLezceZKonzole(List<Lezec> lezci)
         {
-            var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributy();
+            var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributyLezce();
             DateTime datumNarozeniDate = DateTime.ParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture);
             Lezec novyLezec;
 
             if (VypocitejVek(datumNarozeniDate) < 18)
             {
-                var (jmenoZakonnehoZastupce, souhlas) = ZadejDoplnujiciAtributy();
+                var (jmenoZakonnehoZastupce, souhlas) = ZadejDoplnujiciAtributyLezce();
                 novyLezec = new Dite(jmeno, datumNarozeni, vyska, jmenoZakonnehoZastupce, souhlas);
             }
 
@@ -233,7 +250,7 @@ namespace Lezecka_stena_evidence
         public static void EditovatLezce(List<Lezec> lezci)
         {
             Console.Write("Zadej lezce, kterého chceš editovat: ");
-            var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributy();
+            var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributyLezce();
             DateTime datumNarozeniDate = DateTime.ParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture);
 
 
@@ -274,7 +291,7 @@ namespace Lezecka_stena_evidence
 
         public static void SmazatLezce(List<Lezec> lezci)
         {
-            var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributy();
+            var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributyLezce();
             DateTime datumNarozeniDate = DateTime.ParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture);
             
 
@@ -290,6 +307,117 @@ namespace Lezecka_stena_evidence
                 Console.WriteLine("Tento lezec v systemu neexistuje.");
             }
            
+        }
+
+        
+        public static List<LezeckaTrasa> NactiTrasy(string filePath)
+            {
+                List<LezeckaTrasa> trasy = new List<LezeckaTrasa>();
+
+                if (File.Exists(filePath))
+                {
+                    foreach (var line in File.ReadLines(filePath))
+                    {
+                        var parts = line.Split(';');
+                        trasy.Add(new LezeckaTrasa(parts[0], parts[1], (Obtiznost)Enum.Parse(typeof(Obtiznost), parts[2]), double.Parse(parts[3])));
+                    }
+                }
+
+                return trasy;
+            }
+
+       public static void UlozTrasy(string filePath, List<LezeckaTrasa> trasy)
+            {
+                List<string> lines = new List<string>();
+
+                foreach (var trasa in trasy)
+                {
+                    lines.Add($"{trasa.Nazev};{trasa.Autor};{trasa.Obtiznost};{trasa.Delka}");
+                }
+
+                File.WriteAllLines(filePath, lines);
+            }
+
+       public static void VypisTrasy(List<LezeckaTrasa> trasy)
+        {
+            Console.WriteLine($"Seznam tras:");
+            foreach (var trasa in trasy)
+            {
+                Console.WriteLine($"{trasa.Nazev}, Autor: {trasa.Autor}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
+            }
+        }
+
+        public static void PridatTrasuZKonzole(List<LezeckaTrasa> trasy)
+        {
+            var (nazev, autor, obtiznost, delka) = ZadejZakladniAtributyTrasy();
+
+            LezeckaTrasa novaTrasa = new LezeckaTrasa(nazev, autor, obtiznost, delka);
+
+            PridatTrasuPokudNeexistuje(trasy, novaTrasa);
+
+        }
+        public static void PridatTrasuPokudNeexistuje(List<LezeckaTrasa> trasy, LezeckaTrasa novaTrasa)
+        {
+            if (!trasy.Contains(novaTrasa))
+            {
+                trasy.Add(novaTrasa);
+            }
+            else
+            {
+                Console.WriteLine("Tato trasa už je v systemu zaevidovaná.");
+
+            }
+        }
+
+        public static void EditovatTrasu(List<LezeckaTrasa> trasy)
+        {
+            Console.Write("Zadej trasu, kterou chceš editovat: ");
+            var (nazev, autor, obtiznost, delka) = ZadejZakladniAtributyTrasy();
+          
+            LezeckaTrasa trasaKKEditaci = trasy.Find(trasa => trasa.Nazev == nazev && trasa.Autor == autor);
+
+            if (trasaKKEditaci != null)
+            {
+                Console.WriteLine($"Trasa nalezena: {trasaKKEditaci.Nazev}, Autor: {trasaKKEditaci.Autor}, Obtížnost: {trasaKKEditaci.Obtiznost}, Délka: {trasaKKEditaci.Delka} m");
+              
+                Console.Write("Chceš změnit obtížnost? (y/n): ");
+                if (Console.ReadLine().ToLower() == "y")
+                {
+                    Console.Write("Zadej novou obtížnost (B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a nebo B7b): ");
+                    trasaKKEditaci.Obtiznost = (Obtiznost)Enum.Parse(typeof(Obtiznost), Console.ReadLine()); ;
+                }
+
+                Console.Write("Chceš změnit délku trasy? (y/n): ");
+                    if (Console.ReadLine().ToLower() == "y")
+                    {
+                        Console.Write("Zadej novou délku (v m): ");
+                        trasaKKEditaci.Delka = double.Parse(Console.ReadLine());
+                }
+                
+
+                Console.WriteLine("Úpravy byly úspěšně provedeny.");
+            }
+            else
+            {
+                Console.WriteLine("Trasa nebyla nalezena.");
+            }
+        }
+
+        public static void SmazatTrasu(List<LezeckaTrasa> trasy)
+        {
+            var (nazev, autor, obtiznost, delka) = ZadejZakladniAtributyTrasy();
+            LezeckaTrasa trasaKeSmazani = trasy.Find(trasa => trasa.Nazev == nazev && trasa.Autor == autor && trasa.Obtiznost == obtiznost);
+
+            if (trasaKeSmazani != null)
+            {
+                trasy.Remove(trasaKeSmazani);
+                Console.WriteLine($"Trasa {trasaKeSmazani.Nazev} byla úspěšně smazána.");
+            }
+            else
+            {
+                Console.WriteLine("Tato trasa v systemu neexistuje.");
+            }
+
         }
 
         public static string DejNaVyber()
@@ -308,10 +436,11 @@ namespace Lezecka_stena_evidence
             string trasyFilePath = "SeznamTras.csv";
             string evidenceFilePath = "EvidencePokusu.csv";
 
-            // Načtení lezců ze souboru
+            // Načtení lezců a tras ze souboru
             List<Lezec> lezci = EvidencniSystem.NactiLezce(lezciFilePath);
 
-            //  List<LezeckaTrasa> trasy = EvidencniSystem.NactiTrasy("seznamTras.csv");
+            List<LezeckaTrasa> trasy = EvidencniSystem.NactiTrasy(trasyFilePath);
+
             //  Lezeni evidencniZaznam = EvidencniSystem.NactiEvidencniZaznamy("evidencePokusu.csv", lezci, trasy);
 
             Console.WriteLine("Vítej v evidenčním systému lezeckých tras a lezců");
@@ -362,14 +491,36 @@ namespace Lezecka_stena_evidence
                                 break;
                         }
                         EvidencniSystem.UlozLezce(lezciFilePath, lezci);
+                        Console.WriteLine("Úpravy byly úspěšně provedeny.");
                     }
 
                     else if (volbaSeznamu == "2")   //trasy
                     {
-                        EvidencniSystem.DejNaVyber();
-                        break;
+                        string volbaUkonu = EvidencniSystem.DejNaVyber();
+                        switch (volbaUkonu)
+                        {
+                            case "1":
+                                EvidencniSystem.PridatTrasuZKonzole(trasy);
+                                break;
 
+                            case "2":
+                                EvidencniSystem.EditovatTrasu(trasy);
+                                break;
+
+                            case "3":
+                                EvidencniSystem.SmazatTrasu(trasy);
+                                break;
+
+                            case "X" or "x":
+                                return;
+
+                            default:
+                                break;
+                        }
+                        EvidencniSystem.UlozTrasy(trasyFilePath, trasy);
+                        Console.WriteLine("Úpravy byly úspěšně provedeny.");
                     }
+
                     else if (volbaSeznamu == "3")   //pokusy
                     {
                         EvidencniSystem.DejNaVyber();
@@ -385,7 +536,29 @@ namespace Lezecka_stena_evidence
                 }
                 else if (volbaZákladní == "2") //zobrazuji statistiky 
                 {
+                    Console.WriteLine($"Chceš zobrazit: seznam lezců (1), seznam lezeckých tras (2) nebo záznamy lezení(3):");
+                    string volbaStatistiky = Console.ReadLine();
 
+                    switch (volbaStatistiky)
+                    {
+                        case "1":
+                            EvidencniSystem.VypisLezce(lezci);
+                            break;
+
+                        case "2":
+                            EvidencniSystem.VypisTrasy(trasy);
+                            break;
+
+                        case "3":
+                           // Lezeni.ZobrazZaznamyLezeni(Lezeni);
+                            break;
+
+                        case "X" or "x":
+                            return;
+
+                        default:
+                            break;
+                    }
                 }
 
                 else
@@ -394,13 +567,12 @@ namespace Lezecka_stena_evidence
                     break;
                 }
 
-                EvidencniSystem.UlozLezce(lezciFilePath, lezci);
+               
 
             }
 
 
             // vypis seznamu lezců do konzole
-            EvidencniSystem.VypisLezce(lezci);
 
             // Vytvoření lezeckých tras
             LezeckaTrasa trasa1 = new LezeckaTrasa("Trasa A", "Autor 1", Obtiznost.B4b, 15);
@@ -415,10 +587,11 @@ namespace Lezecka_stena_evidence
             evidencniZaznam.PridejZaznamLezeni(lezci[0], trasa2, DateTime.Now, true);
 
             // Zobrazení evidence
-            evidencniZaznam.ZobrazZaznamyLezeni();
+            
 
-            // Uložení seznamu lezců do souboru
+            // Uložení seznamu lezců a tras do souboru
             EvidencniSystem.UlozLezce(lezciFilePath, lezci);
+            EvidencniSystem.UlozTrasy(trasyFilePath, trasy);
         }
 
         
