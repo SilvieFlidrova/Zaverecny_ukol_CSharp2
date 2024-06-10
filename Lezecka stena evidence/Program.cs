@@ -231,11 +231,6 @@ namespace Lezecka_stena_evidence
                 novyLezec = new Lezec(jmeno, datumNarozeni, vyska);
             }
 
-            PridatLezcePokudNeexistuje(lezci, novyLezec);
-
-        }
-            public static void PridatLezcePokudNeexistuje(List<Lezec> lezci, Lezec novyLezec)
-        {
             if (!lezci.Contains(novyLezec))
             {
                 lezci.Add(novyLezec);
@@ -243,7 +238,6 @@ namespace Lezecka_stena_evidence
             else
             {
                 Console.WriteLine("Tento lezec už je v systemu zaevidovany.");
-
             }
         }
 
@@ -353,11 +347,6 @@ namespace Lezecka_stena_evidence
 
             LezeckaTrasa novaTrasa = new LezeckaTrasa(nazev, autor, obtiznost, delka);
 
-            PridatTrasuPokudNeexistuje(trasy, novaTrasa);
-
-        }
-        public static void PridatTrasuPokudNeexistuje(List<LezeckaTrasa> trasy, LezeckaTrasa novaTrasa)
-        {
             if (!trasy.Contains(novaTrasa))
             {
                 trasy.Add(novaTrasa);
@@ -367,7 +356,9 @@ namespace Lezecka_stena_evidence
                 Console.WriteLine("Tato trasa už je v systemu zaevidovaná.");
 
             }
+
         }
+               
 
         public static void EditovatTrasu(List<LezeckaTrasa> trasy)
         {
@@ -571,9 +562,6 @@ namespace Lezecka_stena_evidence
 
             }
 
-
-            // vypis seznamu lezců do konzole
-
             // Vytvoření lezeckých tras
             LezeckaTrasa trasa1 = new LezeckaTrasa("Trasa A", "Autor 1", Obtiznost.B4b, 15);
             LezeckaTrasa trasa2 = new LezeckaTrasa("Trasa B", "Autor 2", Obtiznost.B5b, 14.5);
@@ -585,16 +573,7 @@ namespace Lezecka_stena_evidence
             evidencniZaznam.PridejZaznamLezeni(lezci[0], trasa1, DateTime.Now, true);
             evidencniZaznam.PridejZaznamLezeni(lezci[1], trasa1, DateTime.Now, false);
             evidencniZaznam.PridejZaznamLezeni(lezci[0], trasa2, DateTime.Now, true);
-
-            // Zobrazení evidence
-            
-
-            // Uložení seznamu lezců a tras do souboru
-            EvidencniSystem.UlozLezce(lezciFilePath, lezci);
-            EvidencniSystem.UlozTrasy(trasyFilePath, trasy);
         }
-
-        
     }
 }
 
