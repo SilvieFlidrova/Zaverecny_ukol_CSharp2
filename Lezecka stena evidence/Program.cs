@@ -10,102 +10,7 @@ namespace Lezecka_stena_evidence
     public enum Obtiznost
     { B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a, B7b };
 
-    // Třída pro lezeckou trasu
-    public class LezeckaTrasa
-    {
-        public string Nazev { get; set; }
-        public string Autor { get; set; }
-        public Obtiznost Obtiznost { get; set; }
-        public double Delka { get; set; }
-
-        public LezeckaTrasa(string nazev, string autor, Obtiznost obtiznost, double delka)
-        {
-            Nazev = nazev;
-            Autor = autor;
-            Obtiznost = obtiznost;
-            Delka = delka;
-        }
-    }
-
-    // Třída pro lezce
-    public class Lezec
-    {
-        public string Jmeno { get; set; }
-        public DateTime DatumNarozeni { get; set; }
-        public double Vyska { get; set; }
-
-        public Lezec(string jmeno, string datumNarozeni, double vyska)
-        {
-            Jmeno = jmeno;
-            DatumNarozeni = DateTime.ParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture);
-            Vyska = vyska;
-        }
-
-        // ko unikatnosti
-        public override bool Equals(object obj)
-        {
-            if (obj is Lezec other)
-            {
-                return Jmeno == other.Jmeno && DatumNarozeni == other.DatumNarozeni && Vyska == other.Vyska;
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Jmeno, DatumNarozeni, Vyska);
-        }
-    }
-
-    // Potomek třída pro děti
-    public class Dite : Lezec
-    {
-        public string JmenoZakonnehoZastupce { get; set; }
-        public bool Souhlas { get; set; }
-
-        public Dite(string jmeno, string datumNarozeni, double vyska, string jmenoZZ, bool souhlas)
-         : base(jmeno, datumNarozeni, vyska)
-        {
-            JmenoZakonnehoZastupce = jmenoZZ;
-            Souhlas = souhlas;
-        }
-
-    }
-
-    // Třída pro evidenci lezeckých tras a lezců
-    public class Lezeni
-    {
-        private Dictionary<LezeckaTrasa, List<(Lezec, DateTime, bool)>> lezeni;
-
-        public Lezeni()
-        {
-            lezeni = new Dictionary<LezeckaTrasa, List<(Lezec, DateTime, bool)>>();
-        }
-
-        public void PridejZaznamLezeni(Lezec lezec, LezeckaTrasa trasa, DateTime datum, bool uspech)
-        {
-            if (!lezeni.ContainsKey(trasa))
-            {
-                lezeni[trasa] = new List<(Lezec, DateTime, bool)>();
-            }
-            lezeni[trasa].Add((lezec, datum, uspech));
-        }
-
-        public void ZobrazZaznamyLezeni()
-        {
-            foreach (var trasa in lezeni)
-            {
-                Console.WriteLine($"Lezecka Trasa: {trasa.Key.Nazev}, Autor: {trasa.Key.Autor}, Obtiznost: {trasa.Key.Obtiznost}, Delka: {trasa.Key.Delka}");
-                Console.WriteLine("Historie Lezeni:");
-                foreach (var zaznam in trasa.Value)
-                {
-                    Console.WriteLine($" - Lezec: {zaznam.Item1.Jmeno}, Datum: {zaznam.Item2}, Uspech: {zaznam.Item3}");
-                }
-                Console.WriteLine();
-            }
-        }
-    }
-
+    // Třída pro evidenci lezeckých tras, lezců a pokusů
        public class EvidencniSystem
     {
         public static double VypocitejVek(DateTime datumNarozeni)
@@ -157,6 +62,27 @@ namespace Lezecka_stena_evidence
             return (nazev, autor, obtiznost, delka);
         }
 
+        public static (string nazev, string autor, string jmeno, DateTime datumPokusu, bool uspech) ZadejZakladniAtributyPokusu()
+        {
+            Console.Write("Zadej název trasy: ");
+            string nazev = Console.ReadLine();
+
+            Console.Write("Zadej jméno autora trasy: ");
+            string autor = Console.ReadLine();
+
+            Console.Write("Zadejte jméno lezce: ");
+            string jmeno = Console.ReadLine();
+
+            Console.Write("Zadejte datum lezeckého pokusu (dd.MM.yyyy): ");
+            DateTime datumPokusu = DateTime.ParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture);
+
+            Console.Write("Byl pokus úspěšný? (true/false): ");
+            bool uspech = bool.Parse(Console.ReadLine());
+
+            return (nazev, autor, jmeno, datumPokusu, uspech);
+        }
+
+
         public static List<Lezec> NactiLezce(string lezciFilePath)
         {
             List<Lezec> lezci = new List<Lezec>();
@@ -184,15 +110,23 @@ namespace Lezecka_stena_evidence
 
         public static void VypisLezce(List<Lezec> lezci)
         {
-            Console.WriteLine($"Seznam lezců:");
-            foreach (var lezec in lezci)
+            if (lezci != null)
             {
-                Console.WriteLine($"{lezec.Jmeno}, Datum narození: {lezec.DatumNarozeni:dd.MM.yyyy}, Věk: {Math.Floor(VypocitejVek(lezec.DatumNarozeni))} let, Výška: {lezec.Vyska} cm");
-                if (lezec is Dite dite)
+                Console.WriteLine($"Seznam lezců:");
+                foreach (var lezec in lezci)
                 {
-                    Console.WriteLine($"  Jméno zákonného zástupce: {dite.JmenoZakonnehoZastupce}, Souhlas: {dite.Souhlas}");
+                    Console.WriteLine($"{lezec.Jmeno}, Datum narození: {lezec.DatumNarozeni:dd.MM.yyyy}, Věk: {Math.Floor(VypocitejVek(lezec.DatumNarozeni))} let, Výška: {lezec.Vyska} cm");
+                    if (lezec is Dite dite)
+                    {
+                        Console.WriteLine($"  Jméno zákonného zástupce: {dite.JmenoZakonnehoZastupce}, Souhlas: {dite.Souhlas}");
+                    }
                 }
             }
+            else
+            {
+                Console.WriteLine("Seznam lezců je prázdný");
+            }
+
         }
 
         public static void UlozLezce(string lezciFilePath, List<Lezec> lezci)
@@ -304,7 +238,7 @@ namespace Lezecka_stena_evidence
         }
 
         
-        public static List<LezeckaTrasa> NactiTrasy(string filePath)
+       public static List<LezeckaTrasa> NactiTrasy(string filePath)
             {
                 List<LezeckaTrasa> trasy = new List<LezeckaTrasa>();
 
@@ -334,10 +268,17 @@ namespace Lezecka_stena_evidence
 
        public static void VypisTrasy(List<LezeckaTrasa> trasy)
         {
-            Console.WriteLine($"Seznam tras:");
-            foreach (var trasa in trasy)
+            if (trasy != null)
             {
-                Console.WriteLine($"{trasa.Nazev}, Autor: {trasa.Autor}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
+                Console.WriteLine($"Seznam tras:");
+                foreach (var trasa in trasy)
+                {
+                    Console.WriteLine($"{trasa.Nazev}, Autor: {trasa.Autor}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Seznam tras je prázdný");
             }
         }
 
@@ -411,6 +352,86 @@ namespace Lezecka_stena_evidence
 
         }
 
+        public static List<LezeckyPokus> NactiPokusy(string pokusyFilePath)    
+        {
+            List<LezeckyPokus> pokusy = new List<LezeckyPokus>();
+
+            if (File.Exists(pokusyFilePath))
+            {
+                foreach (var line in File.ReadAllLines(pokusyFilePath))
+                {
+                    var parts = line.Split(';');
+                    pokusy.Add(new LezeckyPokus(parts[0], parts[1], parts[2], DateTime.ParseExact(parts[3], "dd.MM.yyyy", CultureInfo.InvariantCulture), bool.Parse(parts[4])));
+                }
+            }
+           
+            return pokusy;
+
+        }
+
+        public static void UlozPokusy(string FilePath, List<LezeckyPokus> pokusy)
+        {
+            List<string> lines = new List<string>();
+
+            foreach (var pokus in pokusy)
+            {
+                lines.Add($"{pokus.Nazev};{pokus.Autor};{pokus.Jmeno};{pokus.DatumPokusu:dd.MM.yyyy};{pokus.Uspech}");
+            }
+
+            File.WriteAllLines(FilePath, lines);
+        }
+
+        public static void PridatPokusZKonzole(List<LezeckyPokus> pokusy, List<LezeckaTrasa> trasy, List<Lezec> lezci)
+        {
+            var (nazev, autor, jmeno, datumPokusu, uspech) = ZadejZakladniAtributyPokusu();
+
+            LezeckaTrasa trasa = trasy.Find(t => t.Nazev == nazev && t.Autor == autor);
+            Lezec lezec = lezci.Find(l => l.Jmeno == jmeno);
+
+            if (trasa != null && lezec != null && (lezec is Dite dite && dite.Souhlas) || !(lezec is Dite))
+            {
+                LezeckyPokus novyPokus = new LezeckyPokus(trasa.Nazev, trasa.Autor, lezec.Jmeno, datumPokusu, uspech);
+                pokusy.Add(novyPokus);
+                Console.WriteLine("Lezecký pokus úspěšně přidán.");
+            }
+            else
+            {
+                Console.WriteLine("Nelze přidat pokus. Zkontrolujte, zda je trasa a lezec v systému, případně zda má dítě vyslovený souhlas zákonného zástupce s lezením.");
+            }
+        }
+
+        public static void SmazatPokus(List<LezeckyPokus> pokusy)
+        {
+            var (nazev, autor, jmeno, datumPokusu, uspech) = ZadejZakladniAtributyPokusu();
+
+            LezeckyPokus pokusKSmazani = pokusy.Find(p => p.Nazev == nazev && p.Autor == autor && p.Jmeno == jmeno && p.DatumPokusu == datumPokusu && p.Uspech == uspech);
+
+            if (pokusKSmazani != null)
+            {
+                pokusy.Remove(pokusKSmazani);
+                Console.WriteLine("Pokus úspěšně smazán.");
+            }
+            else
+            {
+                Console.WriteLine("Pokus nenalezen.");
+            }
+        }
+
+        public static void VypisLezeckePokusy(List<LezeckyPokus> pokusy)
+        {
+            if (pokusy != null)
+            {
+                Console.WriteLine($"Výpis všech lezeckých pokusů:");
+                foreach (var pokus in pokusy)
+                {
+                    Console.WriteLine($"Trasa: {pokus.Nazev}, Autor: {pokus.Autor}, Lezec: {pokus.Jmeno}, Datum pokusu: {pokus.DatumPokusu}, Byl pokus úspěšný: {pokus.Uspech}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Seznam pokusů je prázdný");
+            }
+        }
         public static string DejNaVyber()
         {
             Console.WriteLine($"Můžeš záznam přidat(1), záznam editovat(2) nebo záznam smazat(3):");
@@ -425,14 +446,14 @@ namespace Lezecka_stena_evidence
         {
             string lezciFilePath = "SeznamLezcu.csv";
             string trasyFilePath = "SeznamTras.csv";
-            string evidenceFilePath = "EvidencePokusu.csv";
+            string pokusyFilePath = "EvidencePokusu.csv";
 
             // Načtení lezců a tras ze souboru
             List<Lezec> lezci = EvidencniSystem.NactiLezce(lezciFilePath);
 
             List<LezeckaTrasa> trasy = EvidencniSystem.NactiTrasy(trasyFilePath);
 
-            //  Lezeni evidencniZaznam = EvidencniSystem.NactiEvidencniZaznamy("evidencePokusu.csv", lezci, trasy);
+            List<LezeckyPokus> pokusy = EvidencniSystem.NactiPokusy(pokusyFilePath);
 
             Console.WriteLine("Vítej v evidenčním systému lezeckých tras a lezců");
             Console.WriteLine("Můžeš editovat seznamy nebo požádat o výpis statistiky.");
@@ -514,7 +535,29 @@ namespace Lezecka_stena_evidence
 
                     else if (volbaSeznamu == "3")   //pokusy
                     {
-                        EvidencniSystem.DejNaVyber();
+                        string volbaUkonu = EvidencniSystem.DejNaVyber();
+                        switch (volbaUkonu)
+                        {
+                            case "1":
+                                EvidencniSystem.PridatPokusZKonzole(pokusy, trasy, lezci);
+                                break;
+
+                            case "2":
+                                Console.WriteLine($"Pokusy nelze editovat. Pokud jsi udělal chybu při zadávání pokusu, odstraň ho a zadej znovu.");
+                                break;
+
+                            case "3":
+                                EvidencniSystem.SmazatPokus(pokusy);
+                                break;
+
+                            case "X" or "x":
+                                return;
+
+                            default:
+                                break;
+                        }
+                        EvidencniSystem.UlozPokusy(trasyFilePath, pokusy);
+                        Console.WriteLine("Úpravy byly úspěšně provedeny.");
                         break;
 
                     }
@@ -541,8 +584,9 @@ namespace Lezecka_stena_evidence
                             break;
 
                         case "3":
-                           // Lezeni.ZobrazZaznamyLezeni(Lezeni);
+                            EvidencniSystem.VypisLezeckePokusy(pokusy);
                             break;
+                            
 
                         case "X" or "x":
                             return;
@@ -562,17 +606,6 @@ namespace Lezecka_stena_evidence
 
             }
 
-            // Vytvoření lezeckých tras
-            LezeckaTrasa trasa1 = new LezeckaTrasa("Trasa A", "Autor 1", Obtiznost.B4b, 15);
-            LezeckaTrasa trasa2 = new LezeckaTrasa("Trasa B", "Autor 2", Obtiznost.B5b, 14.5);
-
-            // Vytvoření evidence
-            Lezeni evidencniZaznam = new Lezeni();
-
-            // Přidání záznamů do evidence
-            evidencniZaznam.PridejZaznamLezeni(lezci[0], trasa1, DateTime.Now, true);
-            evidencniZaznam.PridejZaznamLezeni(lezci[1], trasa1, DateTime.Now, false);
-            evidencniZaznam.PridejZaznamLezeni(lezci[0], trasa2, DateTime.Now, true);
         }
     }
 }
