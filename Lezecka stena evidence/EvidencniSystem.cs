@@ -392,12 +392,12 @@ namespace Lezecka_stena_evidence
         {
             var (nazev, autor, jmeno, datumPokusu, uspech) = ZadejZakladniAtributyPokusu();
 
-            LezeckaTrasa trasa = trasy.Find(t => t.Nazev == nazev && t.Autor == autor);
-            Lezec lezec = lezci.Find(l => l.Jmeno == jmeno);
+            LezeckaTrasa jeExistujiciTrasa = trasy.Find(t => t.Nazev == nazev && t.Autor == autor);
+            Lezec jeExistujiciLezec = lezci.Find(l => l.Jmeno == jmeno);
 
-            if (trasa != null && lezec != null && (lezec is Dite dite && dite.Souhlas) || !(lezec is Dite))
+            if (jeExistujiciTrasa != null && jeExistujiciLezec != null && (jeExistujiciLezec is Dite dite && dite.Souhlas) || !(jeExistujiciLezec is Dite))
             {
-                LezeckyPokus novyPokus = new LezeckyPokus(trasa.Nazev, trasa.Autor, lezec.Jmeno, datumPokusu, uspech);
+                LezeckyPokus novyPokus = new LezeckyPokus(jeExistujiciTrasa.Nazev, jeExistujiciTrasa.Autor, jeExistujiciLezec.Jmeno, datumPokusu, uspech);
                 pokusy.Add(novyPokus);
                 Console.WriteLine("Lezecký pokus úspěšně přidán.");
             }

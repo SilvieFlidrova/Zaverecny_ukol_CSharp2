@@ -13,8 +13,6 @@ namespace Lezecka_stena_evidence
     public enum Obtiznost
     { B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a, B7b };
 
-  
-
     class Program
     {
         static void Main(string[] args)
@@ -23,11 +21,9 @@ namespace Lezecka_stena_evidence
             string trasyFilePath = "SeznamTras.csv";
             string pokusyFilePath = "EvidencePokusu.csv";
 
-            // Načtení lezců a tras ze souboru
+            // Načtení lezců, tras a evidence lezeckých pokusů ze souboru
             List<Lezec> lezci = EvidencniSystem.NactiLezce(lezciFilePath);
-
             List<LezeckaTrasa> trasy = EvidencniSystem.NactiTrasy(trasyFilePath);
-
             List<LezeckyPokus> pokusy = EvidencniSystem.NactiPokusy(pokusyFilePath);
 
             Console.WriteLine("Vítej v evidenčním systému lezeckých tras a lezců");
@@ -123,6 +119,8 @@ namespace Lezecka_stena_evidence
 
                             case "3":
                                 EvidencniSystem.SmazatPokus(pokusy);
+                                Console.WriteLine("Úpravy byly úspěšně provedeny.");
+
                                 break;
 
                             case "X" or "x":
@@ -131,8 +129,7 @@ namespace Lezecka_stena_evidence
                             default:
                                 break;
                         }
-                        EvidencniSystem.UlozPokusy(trasyFilePath, pokusy);
-                        Console.WriteLine("Úpravy byly úspěšně provedeny.");
+                        EvidencniSystem.UlozPokusy(pokusyFilePath, pokusy);
                         break;
 
                     }
@@ -169,6 +166,7 @@ namespace Lezecka_stena_evidence
                             return;
 
                         default:
+                            Console.WriteLine("Neplatný výběr.");
                             break;
                     }
                 }

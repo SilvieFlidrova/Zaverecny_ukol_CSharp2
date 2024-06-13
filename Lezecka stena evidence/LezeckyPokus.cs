@@ -23,6 +23,5 @@ namespace Lezecka_stena_evidence
             DatumPokusu = datumPokusu;
             Uspech = uspech;
         }
-
     }
 }
