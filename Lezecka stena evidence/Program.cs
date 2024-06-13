@@ -148,8 +148,6 @@ namespace Lezecka_stena_evidence
                     switch (volbaStatistiky)
                     {
                         case "1":
-                            // EvidencniSystem.SouborExistuje(lezciFilePath);
-                            // jeSeznam = existenceSouboru;
                             EvidencniSystem.VypisLezce(lezci);
                             break;
 
@@ -177,7 +175,11 @@ namespace Lezecka_stena_evidence
                     break;
                 }
 
-               
+                // "zacyklit" smyčky 
+                // rozšíření statistik - lezců, cest, nejoblibenejsi cesta, nejtezsi cesta lezce, filtrování záznamů podle data, autora trasy....
+                // Implementace IComparable? pro obtížnost
+                // slovniky
+
 
             }
 

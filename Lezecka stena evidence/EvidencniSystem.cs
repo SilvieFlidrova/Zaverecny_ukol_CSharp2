@@ -77,18 +77,7 @@ namespace Lezecka_stena_evidence
 
             return (nazev, autor, jmeno, datumPokusu, uspech);
         }
-
-        //public static bool SouborExistuje(string filePath)
-        //{
-        //    bool existenceSouboru = false;
-        //    if (File.Exists(filePath))
-        //    {
-        //        existenceSouboru = true;
-        //    }
-
-        //    return existenceSouboru;
-        //}
-
+     
         public static List<Lezec> NactiLezce(string lezciFilePath)
         {
             List<Lezec> lezci = new List<Lezec>();
@@ -445,5 +434,15 @@ namespace Lezecka_stena_evidence
             string volbaUkonu = Console.ReadLine();
             return volbaUkonu;
         }
+
+
+        //metodu pro ověření existence souboru před výpisem
+        //oddělení metod pro vstup a výstup od metod pro manipulaci
+        //osetreni výjimek, TryParse
+        //velka = malá písmena
+        //třída pro správu souborů?
+
+
+
     }
 }
