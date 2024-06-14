@@ -1,10 +1,8 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.Diagnostics;
 using System.Globalization;
-using System.Security.Policy;
-using System.Threading.Tasks;
+using System.IO;
 using System.Linq;
 
 namespace Lezecka_stena_evidence
@@ -28,162 +26,235 @@ namespace Lezecka_stena_evidence
 
             Console.WriteLine("Vítej v evidenčním systému lezeckých tras a lezců");
             Console.WriteLine("Můžeš editovat seznamy nebo požádat o výpis statistiky.");
-            Console.WriteLine($"Pokud budeš chtít činnost ukončit, zadej X.");
+            Console.WriteLine("Pokud budeš chtít činnost ukončit, zadej X.");
 
             bool maBezetProgram = true;
             while (maBezetProgram)
             {
                 Console.WriteLine("Chceš upravovat seznamy nebo zobrazit statistiku? (1 = seznamy, 2 = statistika, X = konec)");
-                string volbaZákladní = Console.ReadLine();
+                string volbaZakladni = Console.ReadLine();
 
-                if (volbaZákladní.ToUpper() == "X")
+                if (volbaZakladni.ToUpper() == "X")
                 {
-                    return;
+                    maBezetProgram = false;
                 }
-                else if (volbaZákladní == "1") //upravuji seznamy
+                else if (volbaZakladni == "1")
                 {
-                    Console.WriteLine($"V rámci práce se záznamy můžeš pracovat se seznamem lezců (1), seznamem lezeckých tras(2) nebo evidencí lezeckých pokusů(3):");
-                    string volbaSeznamu = Console.ReadLine();
-                    if (volbaSeznamu.ToUpper() == "X")
-                    {
-                        maBezetProgram = false;
+                    EditaceSeznamu(lezci, trasy, pokusy, lezciFilePath, trasyFilePath, pokusyFilePath);
+                }
+                else if (volbaZakladni == "2")
+                {
+                    ZobrazeniStatistik(lezci, trasy, pokusy);
+                }
+                else
+                {
+                    Console.WriteLine("Neplatný výběr.");
+                }
+            }
+        }
+
+        static void EditaceSeznamu(List<Lezec> lezci, List<LezeckaTrasa> trasy, List<LezeckyPokus> pokusy, string lezciFilePath, string trasyFilePath, string pokusyFilePath)
+        {
+            bool editaceBezi = true;
+            while (editaceBezi)
+            {
+                Console.WriteLine("V rámci práce se záznamy můžeš pracovat se seznamem lezců (1), seznamem lezeckých tras (2) nebo evidencí lezeckých pokusů (3):");
+                string volbaSeznamu = Console.ReadLine();
+                if (volbaSeznamu.ToUpper() == "X") return;
+
+                string volbaUkonu = EvidencniSystem.DejNaVyber();
+                switch (volbaSeznamu)
+                {
+                    case "1":
+                        EditaceLezcu(lezci, volbaUkonu, lezciFilePath);
                         break;
-                    }
-                    else if (volbaSeznamu == "1")   //lezci
-                    {
-                        
-                        string volbaUkonu = EvidencniSystem.DejNaVyber();
-                        switch(volbaUkonu)
-                        {
-                            case "1":
-                                EvidencniSystem.PridatLezceZKonzole(lezci);
-                                break;
-
-                            case "2":
-                                EvidencniSystem.EditovatLezce(lezci);
-                                break;
-
-                            case "3":
-                                EvidencniSystem.SmazatLezce(lezci);
-                                break;
-
-                            case "X" or "x":
-                               return;
-
-                            default:
-                                break;
-                        }
-                        EvidencniSystem.UlozLezce(lezciFilePath, lezci);
-                        Console.WriteLine("Úpravy byly úspěšně provedeny.");
-                    }
-
-                    else if (volbaSeznamu == "2")   //trasy
-                    {
-                        string volbaUkonu = EvidencniSystem.DejNaVyber();
-                        switch (volbaUkonu)
-                        {
-                            case "1":
-                                EvidencniSystem.PridatTrasuZKonzole(trasy);
-                                break;
-
-                            case "2":
-                                EvidencniSystem.EditovatTrasu(trasy);
-                                break;
-
-                            case "3":
-                                EvidencniSystem.SmazatTrasu(trasy);
-                                break;
-
-                            case "X" or "x":
-                                return;
-
-                            default:
-                                break;
-                        }
-                        EvidencniSystem.UlozTrasy(trasyFilePath, trasy);
-                        Console.WriteLine("Úpravy byly úspěšně provedeny.");
-                    }
-
-                    else if (volbaSeznamu == "3")   //pokusy
-                    {
-                        string volbaUkonu = EvidencniSystem.DejNaVyber();
-                        switch (volbaUkonu)
-                        {
-                            case "1":
-                                EvidencniSystem.PridatPokusZKonzole(pokusy, trasy, lezci);
-                                break;
-
-                            case "2":
-                                Console.WriteLine($"Pokusy nelze editovat. Pokud jsi udělal chybu při zadávání pokusu, odstraň ho a zadej znovu.");
-                                break;
-
-                            case "3":
-                                EvidencniSystem.SmazatPokus(pokusy);
-                                Console.WriteLine("Úpravy byly úspěšně provedeny.");
-
-                                break;
-
-                            case "X" or "x":
-                                return;
-
-                            default:
-                                break;
-                        }
-                        EvidencniSystem.UlozPokusy(pokusyFilePath, pokusy);
+                    case "2":
+                        EditaceTras(trasy, volbaUkonu, trasyFilePath);
                         break;
-
-                    }
-                    else 
-                    {
+                    case "3":
+                        EditacePokusů(pokusy, trasy, lezci, volbaUkonu, pokusyFilePath);
+                        break;
+                    default:
                         Console.WriteLine("Neplatný výběr.");
                         break;
-                    }
-
                 }
-                else if (volbaZákladní == "2") //zobrazuji statistiky 
+                Console.WriteLine("Chceš pokračovat v editaci? (y/n)");
+                if (Console.ReadLine().ToLower() != "y")
                 {
-                    Console.WriteLine($"Chceš zobrazit: seznam lezců (1), seznam lezeckých tras (2) nebo záznamy lezení(3):");
-                    string volbaStatistiky = Console.ReadLine();
-                    bool jeSeznam = false;
+                    editaceBezi = false;
+                }
+            }
+        }
+
+        static void EditaceLezcu(List<Lezec> lezci, string volbaUkonu, string lezciFilePath)
+        {
+            try
+            {
+                switch (volbaUkonu)
+                {
+                    case "1":
+                        EvidencniSystem.PridatLezceZKonzole(lezci);
+                        break;
+                    case "2":
+                        EvidencniSystem.EditovatLezce(lezci);
+                        break;
+                    case "3":
+                        EvidencniSystem.SmazatLezce(lezci);
+                        break;
+                    case "X":
+                    case "x":
+                        return;
+                    default:
+                        break;
+                }
+                EvidencniSystem.UlozLezce(lezciFilePath, lezci);
+                Console.WriteLine("Úpravy byly úspěšně provedeny.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Chyba při editaci lezců: {ex.Message}");
+            }
+        }
+
+        static void EditaceTras(List<LezeckaTrasa> trasy, string volbaUkonu, string trasyFilePath)
+        {
+            try
+            {
+                switch (volbaUkonu)
+                {
+                    case "1":
+                        EvidencniSystem.PridatTrasuZKonzole(trasy);
+                        break;
+                    case "2":
+                        EvidencniSystem.EditovatTrasu(trasy);
+                        break;
+                    case "3":
+                        EvidencniSystem.SmazatTrasu(trasy);
+                        break;
+                    case "X":
+                    case "x":
+                        return;
+                    default:
+                        break;
+                }
+                EvidencniSystem.UlozTrasy(trasyFilePath, trasy);
+                Console.WriteLine("Úpravy byly úspěšně provedeny.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Chyba při editaci tras: {ex.Message}");
+            }
+        }
+
+        static void EditacePokusů(List<LezeckyPokus> pokusy, List<LezeckaTrasa> trasy, List<Lezec> lezci, string volbaUkonu, string pokusyFilePath)
+        {
+            try
+            {
+                switch (volbaUkonu)
+                {
+                    case "1":
+                        EvidencniSystem.PridatPokusZKonzole(pokusy, trasy, lezci);
+                        break;
+                    case "2":
+                        Console.WriteLine("Pokusy nelze editovat. Pokud jsi udělal chybu při zadávání pokusu, odstraň ho a zadej znovu.");
+                        break;
+                    case "3":
+                        EvidencniSystem.SmazatPokus(pokusy);
+                        Console.WriteLine("Úpravy byly úspěšně provedeny.");
+                        break;
+                    case "X":
+                    case "x":
+                        return;
+                    default:
+                        break;
+                }
+                EvidencniSystem.UlozPokusy(pokusyFilePath, pokusy);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Chyba při editaci pokusů: {ex.Message}");
+            }
+        }
+
+        static void ZobrazeniStatistik(List<Lezec> lezci, List<LezeckaTrasa> trasy, List<LezeckyPokus> pokusy)
+        {
+            bool zobrazeniBezi = true;
+            while (zobrazeniBezi)
+            {
+                Console.WriteLine($"Chceš zobrazit: seznam lezců (1), seznam lezeckých tras (2), záznamy lezení (3), záznamy lezení lezce podle tras (4), záznamy lezení lezce podle data (5), průměrná úspěšnost lezce (6), nejtěžší trasa lezce (7), záznamy lezení na trase podle lezců (8), záznamy lezení na trase podle data (9), průměrná úspěšnost trasy (10), počet evidovaných tras (11), počet evidovaných lezců (12), seznam tras podle autora (13), seznam tras podle obtížnosti (14), seznam tras podle názvu (15). Pokud chceš vyskočit ze statistik, zadej Z:");
+                string volbaStatistiky = Console.ReadLine();
+                try
+                {
                     switch (volbaStatistiky)
                     {
                         case "1":
                             EvidencniSystem.VypisLezce(lezci);
                             break;
-
                         case "2":
                             EvidencniSystem.VypisTrasy(trasy);
                             break;
-
                         case "3":
                             EvidencniSystem.VypisLezeckePokusy(pokusy);
                             break;
-                            
-
-                        case "X" or "x":
-                            return;
-
+                        case "4":
+                            EvidencniSystem.VypisPokusyLezcePodleTrasy(pokusy);
+                            break;
+                        case "5":
+                            EvidencniSystem.VypisPokusyLezcePodleData(pokusy);
+                            break;
+                        case "6":
+                            EvidencniSystem.PrumernaUspechLezce(pokusy);
+                            break;
+                        case "7":
+                            EvidencniSystem.NejlepsiDosaLezce(pokusy);
+                            break;
+                        case "8":
+                            EvidencniSystem.VypisPokusyNaTrasePodleLezce(pokusy);
+                            break;
+                        case "9":
+                            EvidencniSystem.VypisPokusyNaTrasePodleData(pokusy);
+                            break;
+                        case "10":
+                            EvidencniSystem.PrumernaUspechTrasy(pokusy);
+                            break;
+                        case "11":
+                            Console.WriteLine($"Počet všech evidovaných tras: {trasy.Count}");
+                            break;
+                        case "12":
+                            Console.WriteLine($"Počet všech evidovaných lezců: {lezci.Count}");
+                            break;
+                        case "13":
+                            EvidencniSystem.VypisTrasyPodleAutora(trasy);
+                            break;
+                        case "14":
+                            EvidencniSystem.VypisTrasyPodleObtiznosti(trasy);
+                            break;
+                        case "15":
+                            EvidencniSystem.VypisTrasyPodleNazvu(trasy);
+                            break;
+                        case "Z":
+                        case "z":
+                            zobrazeniBezi = false;
+                            break;
                         default:
                             Console.WriteLine("Neplatný výběr.");
                             break;
                     }
                 }
-
-                else
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Neplatný výběr.");
-                    break;
+                    Console.WriteLine($"Chyba při zobrazování statistik: {ex.Message}");
                 }
 
-                // "zacyklit" smyčky 
-                // rozšíření statistik - lezců, cest, nejoblibenejsi cesta, nejtezsi cesta lezce, filtrování záznamů podle data, autora trasy....
-                // Implementace IComparable? pro obtížnost
-                // slovniky
-
-
+                if (zobrazeniBezi)
+                {
+                    Console.WriteLine("Chceš pokračovat v zobrazování statistik? (y/n)");
+                    if (Console.ReadLine().ToLower() != "y")
+                    {
+                        zobrazeniBezi = false;
+                    }
+                }
             }
-
         }
     }
 }
-
