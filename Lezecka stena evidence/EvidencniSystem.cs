@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 public class EvidencniSystem
 {
+    //pomocne metody
     public static double VypocitejVek(DateTime datumNarozeni)
     {
         TimeSpan vekSpan = DateTime.Now - datumNarozeni;
@@ -35,22 +36,44 @@ public class EvidencniSystem
         return char.ToUpper(vstup[0]) + vstup.Substring(1).ToLower();
     }
 
+    public static double ZiskejVysku()
+    {
+        Console.Write("Zadejte výšku lezce (v cm): ");
+        double vyska;
+        while (!double.TryParse(Console.ReadLine(), out vyska))
+        {
+            Console.WriteLine("Neplatný formát výšky. Zadejte prosím znovu:");
+        }
+        return vyska;
+    }
 
+    public static DateTime ZiskejDatum(string prompt)
+    {
+        Console.Write(prompt);
+        DateTime datum;
+        while (!DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datum))
+        {
+            Console.WriteLine("Neplatný formát data. Zadejte prosím znovu (dd.MM.yyyy):");
+        }
+        return datum;
+    }
+
+    public static string DejNaVyber()
+    {
+        Console.WriteLine($"Můžeš záznam přidat(1), záznam editovat(2) nebo záznam smazat(3):");
+        string volbaUkonu = Console.ReadLine();
+        return volbaUkonu;
+    }
+
+
+    //metody pro zadani atributu
     public static (string jmeno, string datumNarozeni, double vyska) ZadejZakladniAtributyLezce()
     {
         string jmeno = ZiskejCeleJmeno();
-
-        Console.Write("Zadej datum narození lezce (dd.MM.yyyy): ");
-        string datumNarozeni = Console.ReadLine();
-
-        Console.Write("Zadej výšku lezce (v cm): ");
-        double vyska;
-        if (!double.TryParse(Console.ReadLine(), out vyska))
-        {
-            Console.WriteLine("Neplatný formát výšky.");
-            return default;
-        }
-        return (jmeno, datumNarozeni, vyska);
+        DateTime datumNarozeni = ZiskejDatum("Zadejte datum narození lezce (dd.MM.yyyy): ");
+        double vyska = ZiskejVysku();
+        
+        return (jmeno, datumNarozeni.ToString("dd.MM.yyyy"), vyska);
     }
 
     public static (string jmenoZakonnehoZastupce, bool souhlas) ZadejDoplnujiciAtributyLezce()
@@ -107,13 +130,8 @@ public class EvidencniSystem
 
         string jmeno = ZiskejCeleJmeno();
 
-        Console.Write("Zadej datum lezeckého pokusu (dd.MM.yyyy): ");
-        DateTime datumPokusu;
-        if (!DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datumPokusu))
-        {
-            Console.WriteLine("Neplatný formát data.");
-            return default;
-        }
+        DateTime datumPokusu = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
+       
 
         Console.Write("Byl pokus úspěšný? (true/false): ");
         bool uspech;
@@ -126,6 +144,7 @@ public class EvidencniSystem
         return (nazev, autor, jmeno, datumPokusu, uspech);
     }
 
+    //metody pro praci s daty
     public static List<Lezec> NactiLezce(string lezciFilePath)
     {
         List<Lezec> lezci = new List<Lezec>();
@@ -231,16 +250,10 @@ public class EvidencniSystem
 
     public static void EditovatLezce(List<Lezec> lezci)
     {
-        Console.Write("Zadej lezce, kterého chceš editovat: ");
-        var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributyLezce();
-        DateTime datumNarozeniDate;
-        if (!DateTime.TryParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datumNarozeniDate))
-        {
-            Console.WriteLine("Neplatný formát data.");
-            return;
-        }
+        string jmeno = ZiskejCeleJmeno();
+        DateTime datumNarozeni = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
 
-        Lezec lezecKEditaci = lezci.Find(lezec => lezec.Jmeno == jmeno && lezec.DatumNarozeni == datumNarozeniDate);
+        Lezec lezecKEditaci = lezci.Find(lezec => lezec.Jmeno == jmeno && lezec.DatumNarozeni == datumNarozeni);
 
         if (lezecKEditaci != null)
         {
@@ -253,15 +266,9 @@ public class EvidencniSystem
             Console.Write("Chceš změnit výšku? (y/n): ");
             if (Console.ReadLine().ToLower() == "y")
             {
-                Console.Write("Zadej novou výšku (v cm): ");
-                if (!double.TryParse(Console.ReadLine(), out double novaVyska))
-                {
-                    Console.WriteLine("Neplatný formát výšky.");
-                    return;
-                }
-                lezecKEditaci.Vyska = novaVyska;
+                lezecKEditaci.Vyska = ZiskejVysku();
             }
-
+                
             if (lezecKEditaci is Dite diteKEditaci)
             {
                 Console.Write("Chceš změnit souhlas zákonného zástupce? (y/n): ");
@@ -287,16 +294,10 @@ public class EvidencniSystem
 
     public static void SmazatLezce(List<Lezec> lezci)
     {
-        Console.WriteLine("Zadej lezce, kterého chceš vymazat ze seznamu: ");
-        var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributyLezce();
-        DateTime datumNarozeniDate;
-        if (!DateTime.TryParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datumNarozeniDate))
-        {
-            Console.WriteLine("Neplatný formát data.");
-            return;
-        }
+        string jmeno = ZiskejCeleJmeno();
+        DateTime datumNarozeni = ZiskejDatum("Zadej datum narození lezce (dd.MM.yyyy): ");
 
-        Lezec lezecKeSmazani = lezci.Find(lezec => lezec.Jmeno == jmeno && lezec.DatumNarozeni == datumNarozeniDate && lezec.Vyska == vyska);
+        Lezec lezecKeSmazani = lezci.Find(lezec => lezec.Jmeno == jmeno && lezec.DatumNarozeni == datumNarozeni);
 
         if (lezecKeSmazani != null)
         {
@@ -566,7 +567,7 @@ public class EvidencniSystem
             Console.WriteLine($"Pokusy lezce {jmeno} seřazené podle data:");
             foreach (var pokus in pokusyLezce)
             {
-                Console.WriteLine($"Trasa: {pokus.Nazev}, Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Úspěch: {pokus.Uspech}");
+                Console.WriteLine($"Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Trasa: {pokus.Nazev}, Úspěch: {pokus.Uspech}");
             }
         }
         else
@@ -575,7 +576,7 @@ public class EvidencniSystem
         }
     }
 
-    public static void PrumernaUspechLezce(List<LezeckyPokus> pokusy)
+    public static void PrumernaUspesnostLezce(List<LezeckyPokus> pokusy)
     {
         if (pokusy == null || !pokusy.Any())
         {
@@ -599,7 +600,7 @@ public class EvidencniSystem
         }
     }
 
-    public static void NejlepsiDosaLezce(List<LezeckyPokus> pokusy)
+    public static void NejlepsiUspechLezce(List<LezeckyPokus> pokusy, List<LezeckaTrasa> trasy)
     {
         if (pokusy == null || !pokusy.Any())
         {
@@ -614,8 +615,9 @@ public class EvidencniSystem
 
         if (pokusyLezce.Any())
         {
-            var nejtessiTrasa = pokusyLezce.OrderByDescending(p => (int)p.Nazev.Last()).First();
-            Console.WriteLine($"Nejtěžší dosažená trasa lezce {jmeno} je {nejtessiTrasa.Nazev}.");
+            var nejtezsiPokus = pokusyLezce.OrderByDescending(p => (int)p.Nazev.Last()).First();
+            var nejtezsiTrasa = trasy.Find(t => t.Nazev == nejtezsiPokus.Nazev);
+            Console.WriteLine($"Nejtěžší dosažená trasa lezce {jmeno} je {nejtezsiPokus.Nazev} s obtížností {nejtezsiTrasa.Obtiznost}.");
         }
         else
         {
@@ -666,7 +668,7 @@ public class EvidencniSystem
             Console.WriteLine($"Pokusy na trase {nazevTrasy} seřazené podle data:");
             foreach (var pokus in pokusyNaTrase)
             {
-                Console.WriteLine($"Lezec: {pokus.Jmeno}, Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Úspěch: {pokus.Uspech}");
+                Console.WriteLine($"Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Lezec: {pokus.Jmeno}, Úspěch: {pokus.Uspech}");
             }
         }
         else
@@ -675,7 +677,7 @@ public class EvidencniSystem
         }
     }
 
-    public static void PrumernaUspechTrasy(List<LezeckyPokus> pokusy)
+    public static void PrumernaUspesnostTrasy(List<LezeckyPokus> pokusy)
     {
         if (pokusy == null || !pokusy.Any())
         {
@@ -711,7 +713,7 @@ public class EvidencniSystem
         Console.WriteLine("Seznam tras seřazený podle autora:");
         foreach (var trasa in trasyPodleAutora)
         {
-            Console.WriteLine($"Název: {trasa.Nazev}, Autor: {trasa.Autor}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
+            Console.WriteLine($"Autor: {trasa.Autor}, Název: {trasa.Nazev}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
         }
     }
 
@@ -728,7 +730,7 @@ public class EvidencniSystem
         Console.WriteLine("Seznam tras seřazený podle obtížnosti:");
         foreach (var trasa in trasyPodleObtiznosti)
         {
-            Console.WriteLine($"Název: {trasa.Nazev}, Autor: {trasa.Autor}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
+            Console.WriteLine($"Obtížnost: {trasa.Obtiznost}, Název: {trasa.Nazev}, Autor: {trasa.Autor}, Délka: {trasa.Delka} m");
         }
     }
 
@@ -749,10 +751,4 @@ public class EvidencniSystem
         }
     }
 
-    public static string DejNaVyber()
-    {
-        Console.WriteLine($"Můžeš záznam přidat(1), záznam editovat(2) nebo záznam smazat(3):");
-        string volbaUkonu = Console.ReadLine();
-        return volbaUkonu;
-    }
 }

@@ -203,7 +203,7 @@ namespace Lezecka_stena_evidence
                             EvidencniSystem.VypisPokusyLezcePodleData(pokusy);
                             break;
                         case "6":
-                            EvidencniSystem.PrumernaUspechLezce(pokusy);
+                            EvidencniSystem.PrumernaUspesnostLezce(pokusy);
                             break;
                         case "7":
                             EvidencniSystem.NejlepsiDosaLezce(pokusy);
@@ -215,7 +215,7 @@ namespace Lezecka_stena_evidence
                             EvidencniSystem.VypisPokusyNaTrasePodleData(pokusy);
                             break;
                         case "10":
-                            EvidencniSystem.PrumernaUspechTrasy(pokusy);
+                            EvidencniSystem.PrumernaUspesnostTrasy(pokusy);
                             break;
                         case "11":
                             Console.WriteLine($"Počet všech evidovaných tras: {trasy.Count}");
