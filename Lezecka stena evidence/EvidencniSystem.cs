@@ -70,7 +70,7 @@ public class EvidencniSystem
 
         while (!bool.TryParse(Console.ReadLine(), out hodnota))
         {
-            Console.WriteLine("Neplatný formát. Zadej prosím tru nebo false: ");
+            Console.WriteLine("Neplatný formát. Zadej prosím true nebo false: ");
             Console.Write(prompt);
         }
         return hodnota;
@@ -384,7 +384,10 @@ public class EvidencniSystem
 
     public static void EditovatTrasu(List<LezeckaTrasa> trasy)
     {
+        Console.Write("Zadej název trasy: ");
         string nazev = NormalizeText(Console.ReadLine());
+        Console.Write("Zadej autora trasy: ");
+
         string autor = NormalizeText(Console.ReadLine());
 
         LezeckaTrasa trasaKEditaci = trasy.Find(trasa => trasa.Nazev == nazev && trasa.Autor == autor);
@@ -428,7 +431,10 @@ public class EvidencniSystem
 
     public static void SmazatTrasu(List<LezeckaTrasa> trasy)
     {
+        Console.Write("Zadej název trasy: ");
+
         string nazev = NormalizeText(Console.ReadLine());
+        Console.Write("Zadej autora trasy: ");
         string autor = NormalizeText(Console.ReadLine());
         Console.Write("Zadej obtížnost trasy (B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a nebo B7b): ");
         Obtiznost obtiznost;
