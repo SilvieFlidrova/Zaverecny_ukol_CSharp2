@@ -27,13 +27,18 @@ public class EvidencniSystem
         Console.Write(prompt);
         string vstup = Console.ReadLine();
 
-        if (string.IsNullOrWhiteSpace(vstup))
+        return NormalizeText(vstup);
+    }
+
+    public static string NormalizeText(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
         {
             return "Neznámé";
         }
 
-        vstup = vstup.Trim();
-        return char.ToUpper(vstup[0]) + vstup.Substring(1).ToLower();
+        text = text.Trim();
+        return char.ToUpper(text[0]) + text.Substring(1).ToLower();
     }
 
     public static double ZiskejVysku()
@@ -58,6 +63,19 @@ public class EvidencniSystem
         return datum;
     }
 
+    public static bool ZiskejBool(string prompt)
+    {
+        Console.Write(prompt);
+        bool hodnota;
+
+        while (!bool.TryParse(Console.ReadLine(), out hodnota))
+        {
+            Console.WriteLine("Neplatný formát. Zadej prosím tru nebo false: ");
+            Console.Write(prompt);
+        }
+        return hodnota;
+    }
+
     public static string DejNaVyber()
     {
         Console.WriteLine($"Můžeš záznam přidat(1), záznam editovat(2) nebo záznam smazat(3):");
@@ -78,27 +96,20 @@ public class EvidencniSystem
 
     public static (string jmenoZakonnehoZastupce, bool souhlas) ZadejDoplnujiciAtributyLezce()
     {
-        Console.Write("Zadej jméno zákonného zástupce: ");
-        string jmenoZakonnehoZastupce = Console.ReadLine();
+        string jmenoZakonnehoZastupce = ZiskejJmeno("Zadej jméno zákonného zástupce: ");
 
-        Console.Write("Souhlasí zákonný zástupce? (true/false): ");
-        bool souhlas;
-        if (!bool.TryParse(Console.ReadLine(), out souhlas))
-        {
-            Console.WriteLine("Neplatný formát souhlasu.");
-            return default;
-        }
-
+       
+        bool souhlas = ZiskejBool("Souhlasí zákonný zástupce? (true/false): ");
+        
         return (jmenoZakonnehoZastupce, souhlas);
     }
 
     public static (string nazev, string autor, Obtiznost obtiznost, double delka) ZadejZakladniAtributyTrasy()
     {
         Console.Write("Zadej název trasy: ");
-        string nazev = Console.ReadLine();
-
-        Console.Write("Zadej jméno autora trasy: ");
-        string autor = Console.ReadLine();
+        string nazev = NormalizeText(Console.ReadLine());
+        Console.Write("Zadej autora trasy: ");
+        string autor = NormalizeText(Console.ReadLine());
 
         Console.Write("Zadej obtížnost trasy (B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a nebo B7b): ");
         string obtiznostStr = Console.ReadLine();
@@ -123,24 +134,17 @@ public class EvidencniSystem
     public static (string nazev, string autor, string jmeno, DateTime datumPokusu, bool uspech) ZadejZakladniAtributyPokusu()
     {
         Console.Write("Zadej název trasy: ");
-        string nazev = Console.ReadLine();
+        string nazev = NormalizeText(Console.ReadLine());
 
         Console.Write("Zadej jméno autora trasy: ");
-        string autor = Console.ReadLine();
-
+        string autor = NormalizeText(Console.ReadLine());
+        
         string jmeno = ZiskejCeleJmeno();
 
         DateTime datumPokusu = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
        
-
-        Console.Write("Byl pokus úspěšný? (true/false): ");
-        bool uspech;
-        if (!bool.TryParse(Console.ReadLine(), out uspech))
-        {
-            Console.WriteLine("Neplatný formát úspěšnosti.");
-            return default;
-        }
-
+        bool uspech = ZiskejBool("Byl pokus úspěšný? (true/false): ");
+       
         return (nazev, autor, jmeno, datumPokusu, uspech);
     }
 
@@ -380,8 +384,8 @@ public class EvidencniSystem
 
     public static void EditovatTrasu(List<LezeckaTrasa> trasy)
     {
-        Console.Write("Zadej trasu, kterou chceš editovat: ");
-        var (nazev, autor, obtiznost, delka) = ZadejZakladniAtributyTrasy();
+        string nazev = NormalizeText(Console.ReadLine());
+        string autor = NormalizeText(Console.ReadLine());
 
         LezeckaTrasa trasaKEditaci = trasy.Find(trasa => trasa.Nazev == nazev && trasa.Autor == autor);
 
@@ -424,7 +428,15 @@ public class EvidencniSystem
 
     public static void SmazatTrasu(List<LezeckaTrasa> trasy)
     {
-        var (nazev, autor, obtiznost, delka) = ZadejZakladniAtributyTrasy();
+        string nazev = NormalizeText(Console.ReadLine());
+        string autor = NormalizeText(Console.ReadLine());
+        Console.Write("Zadej obtížnost trasy (B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a nebo B7b): ");
+        Obtiznost obtiznost;
+        if (!Enum.TryParse(Console.ReadLine(), out obtiznost))
+        {
+            Console.WriteLine("Neplatný formát obtížnosti.");
+            return;
+        }
         LezeckaTrasa trasaKeSmazani = trasy.Find(trasa => trasa.Nazev == nazev && trasa.Autor == autor && trasa.Obtiznost == obtiznost);
 
         if (trasaKeSmazani != null)
@@ -617,7 +629,15 @@ public class EvidencniSystem
         {
             var nejtezsiPokus = pokusyLezce.OrderByDescending(p => (int)p.Nazev.Last()).First();
             var nejtezsiTrasa = trasy.Find(t => t.Nazev == nejtezsiPokus.Nazev);
-            Console.WriteLine($"Nejtěžší dosažená trasa lezce {jmeno} je {nejtezsiPokus.Nazev} s obtížností {nejtezsiTrasa.Obtiznost}.");
+
+            if (nejtezsiTrasa != null)
+            {
+                Console.WriteLine($"Nejtěžší dosažená trasa lezce {jmeno} je {nejtezsiPokus.Nazev} s obtížností {nejtezsiTrasa.Obtiznost}.");
+            }
+            else
+            {
+                Console.WriteLine($"Nejtěžší trasa lezce {jmeno} v sezanmu nenalezena.");
+            }
         }
         else
         {
@@ -708,7 +728,7 @@ public class EvidencniSystem
             return;
         }
 
-        var trasyPodleAutora = trasy.OrderBy(t => t.Autor).ToList();
+        var trasyPodleAutora = trasy.OrderBy(t => NormalizeText(t.Autor)).ToList();
 
         Console.WriteLine("Seznam tras seřazený podle autora:");
         foreach (var trasa in trasyPodleAutora)
@@ -742,7 +762,7 @@ public class EvidencniSystem
             return;
         }
 
-        var trasyPodleNazvu = trasy.OrderBy(t => t.Nazev).ToList();
+        var trasyPodleNazvu = trasy.OrderBy(t => NormalizeText(t.Nazev)).ToList();
 
         Console.WriteLine("Seznam tras seřazený podle názvu:");
         foreach (var trasa in trasyPodleNazvu)
