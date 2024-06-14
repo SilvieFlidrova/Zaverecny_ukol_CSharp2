@@ -14,17 +14,31 @@ public class EvidencniSystem
         return vekSpan.TotalDays / 365.25;
     }
 
-   
+    public static string ZiskejCeleJmeno()
+    {
+        string krestniJmeno = ZiskejJmeno("Zadejte křestní jméno lezce: ");
+        string prijmeni = ZiskejJmeno("Zadejte příjmení lezce: ");
+        return $"{krestniJmeno} {prijmeni}";
+    }
+
+    public static string ZiskejJmeno(string prompt)
+    {
+        Console.Write(prompt);
+        string vstup = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(vstup))
+        {
+            return "Neznámé";
+        }
+
+        vstup = vstup.Trim();
+        return char.ToUpper(vstup[0]) + vstup.Substring(1).ToLower();
+    }
+
 
     public static (string jmeno, string datumNarozeni, double vyska) ZadejZakladniAtributyLezce()
     {
-        Console.Write("Zadej křestní jméno lezce: ");
-        string krestniJmeno = ZiskejJmeno(Console.ReadLine());
-
-        Console.Write("Zadej příjmení lezce: ");
-        string prijmeni = ZiskejJmeno(Console.ReadLine());
-
-        string jmeno = $"{krestniJmeno} {prijmeni}";
+        string jmeno = ZiskejCeleJmeno();
 
         Console.Write("Zadej datum narození lezce (dd.MM.yyyy): ");
         string datumNarozeni = Console.ReadLine();
@@ -37,17 +51,6 @@ public class EvidencniSystem
             return default;
         }
         return (jmeno, datumNarozeni, vyska);
-    }
-
-    private static string ZiskejJmeno(string vstup)
-    {
-        if (string.IsNullOrWhiteSpace(vstup))
-        {
-            return "Neznámé";
-        }
-
-        vstup = vstup.Trim();
-        return char.ToUpper(vstup[0]) + vstup.Substring(1).ToLower();
     }
 
     public static (string jmenoZakonnehoZastupce, bool souhlas) ZadejDoplnujiciAtributyLezce()
@@ -102,13 +105,7 @@ public class EvidencniSystem
         Console.Write("Zadej jméno autora trasy: ");
         string autor = Console.ReadLine();
 
-        Console.Write("Zadej křestní jméno lezce: ");
-        string krestniJmeno = ZiskejJmeno(Console.ReadLine());
-
-        Console.Write("Zadej příjmení lezce: ");
-        string prijmeni = ZiskejJmeno(Console.ReadLine());
-
-        string jmeno = $"{krestniJmeno} {prijmeni}";
+        string jmeno = ZiskejCeleJmeno();
 
         Console.Write("Zadej datum lezeckého pokusu (dd.MM.yyyy): ");
         DateTime datumPokusu;
@@ -534,13 +531,7 @@ public class EvidencniSystem
             return;
         }
 
-        Console.Write("Zadejte křestní jméno lezce: ");
-        string krestniJmeno = ZiskejJmeno(Console.ReadLine());
-
-        Console.Write("Zadejte příjmení lezce: ");
-        string prijmeni = ZiskejJmeno(Console.ReadLine());
-
-        string jmeno = $"{krestniJmeno} {prijmeni}";
+        string jmeno = ZiskejCeleJmeno();
 
         var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).OrderBy(p => p.Nazev).ToList();
 
@@ -566,13 +557,7 @@ public class EvidencniSystem
             return;
         }
 
-        Console.Write("Zadej křestní jméno lezce: ");
-        string krestniJmeno = ZiskejJmeno(Console.ReadLine());
-
-        Console.Write("Zadej příjmení lezce: ");
-        string prijmeni = ZiskejJmeno(Console.ReadLine());
-
-        string jmeno = $"{krestniJmeno} {prijmeni}";
+        string jmeno = ZiskejCeleJmeno();
 
         var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).OrderBy(p => p.DatumPokusu).ToList();
 
@@ -598,13 +583,8 @@ public class EvidencniSystem
             return;
         }
 
-        Console.Write("Zadej křestní jméno lezce: ");
-        string krestniJmeno = ZiskejJmeno(Console.ReadLine());
+        string jmeno = ZiskejCeleJmeno();
 
-        Console.Write("Zadej příjmení lezce: ");
-        string prijmeni = ZiskejJmeno(Console.ReadLine());
-
-        string jmeno = $"{krestniJmeno} {prijmeni}";
 
         var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).ToList();
 
@@ -627,13 +607,8 @@ public class EvidencniSystem
             return;
         }
 
-        Console.Write("Zadej křestní jméno lezce: ");
-        string krestniJmeno = ZiskejJmeno(Console.ReadLine());
+        string jmeno = ZiskejCeleJmeno();
 
-        Console.Write("Zadej příjmení lezce: ");
-        string prijmeni = ZiskejJmeno(Console.ReadLine());
-
-        string jmeno = $"{krestniJmeno} {prijmeni}";
 
         var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno && p.Uspech).ToList();
 
