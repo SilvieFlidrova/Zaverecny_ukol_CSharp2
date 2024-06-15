@@ -279,7 +279,17 @@ public class EvidencniSystem
             }
         }
 
+        try
+        {
         File.WriteAllLines(lezciFilePath, lines);
+        }
+
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Chyba při ukládání lezců: {ex.Message}");
+        }
+
+        
     }
 
     public static void PridatLezceZKonzole(List<Lezec> lezci)
@@ -406,8 +416,17 @@ public class EvidencniSystem
         {
             lines.Add($"{trasa.Nazev};{trasa.Autor};{trasa.Obtiznost};{trasa.Delka}");
         }
+        try
+        {
+            File.WriteAllLines(filePath, lines);
+        }
 
-        File.WriteAllLines(filePath, lines);
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Chyba při ukládání tras: {ex.Message}");
+        }
+
+       
     }
 
     public static void VypisTrasy(List<LezeckaTrasa> trasy)
@@ -548,8 +567,16 @@ public class EvidencniSystem
         {
             lines.Add($"{pokus.Nazev};{pokus.Autor};{pokus.Jmeno};{pokus.DatumPokusu:dd.MM.yyyy};{pokus.Uspech}");
         }
-
+        try
+        {
         File.WriteAllLines(filePath, lines);
+        }
+
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Chyba při ukládání pokusů: {ex.Message}");
+        }
+       
     }
 
     public static void PridatPokusZKonzole(List<LezeckyPokus> pokusy, List<LezeckaTrasa> trasy, List<Lezec> lezci)
