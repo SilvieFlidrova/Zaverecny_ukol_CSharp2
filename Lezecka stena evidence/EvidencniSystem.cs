@@ -81,20 +81,40 @@ public class EvidencniSystem
             {
                 Console.WriteLine("Neplatný formát data. Zadejte prosím znovu (dd.MM.yyyy):");
             }
-        } while (!DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datum));
+        } while (!DateTime.TryParseExact(vstup, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datum));
             return datum;
     }
 
     public static bool ZiskejBool(string prompt)
     {
         Console.Write(prompt);
-        bool hodnota;
 
-        while (!bool.TryParse(Console.ReadLine(), out hodnota))
+        string vstup;
+
+        bool hodnota = false;
+        bool validniVstup = false;
+
+        while(!validniVstup)
         {
-            Console.WriteLine("Neplatný formát. Zadej prosím true nebo false: ");
-            Console.Write(prompt);
+            vstup = Console.ReadLine().ToLower();
+            if (vstup == "y")
+            {
+                hodnota = true;
+                validniVstup = true;
+            }
+            else if (vstup == "n")
+            {
+                hodnota = false;
+                validniVstup = true;
+            }
+            else
+            {
+                Console.WriteLine("Neplatný formát. Zadej prosím y jako ano nebo n jako ne: ");
+                Console.Write(prompt);
+            }
         }
+
+        
         return hodnota;
     }
 
@@ -124,7 +144,7 @@ public class EvidencniSystem
         string jmenoZakonnehoZastupce = ZiskejJmeno("Zadej jméno zákonného zástupce: ");
 
        
-        bool souhlas = ZiskejBool("Souhlasí zákonný zástupce? (true/false): ");
+        bool souhlas = ZiskejBool("Existuje Souhlas zákonného zástupce s lezením dítěte? (y/n): ");
         
         return (jmenoZakonnehoZastupce, souhlas);
     }
@@ -141,10 +161,18 @@ public class EvidencniSystem
                 Console.WriteLine("Název trasy je povinný, musiš ho zadat.");
             }
         } while (string.IsNullOrWhiteSpace(nazev));
-       
-        Console.Write("Zadej autora trasy: ");
-        string autor = NormalizeText(Console.ReadLine());
 
+        string autor;
+        do
+        {
+            Console.Write("Zadej autora trasy: ");
+            autor = NormalizeText(Console.ReadLine());
+            if (string.IsNullOrWhiteSpace(autor))
+            {
+                Console.WriteLine("Autor trasy je povinný, musiš ho zadat. Pokud ho neznáš, zadej anonym");
+            }
+        } while (string.IsNullOrWhiteSpace(autor));
+      
         Console.Write("Zadej obtížnost trasy (B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a nebo B7b): ");
         string obtiznostStr = Console.ReadLine();
         Obtiznost obtiznost;
@@ -177,7 +205,7 @@ public class EvidencniSystem
 
         DateTime datumPokusu = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
        
-        bool uspech = ZiskejBool("Byl pokus úspěšný? (true/false): ");
+        bool uspech = ZiskejBool("Byl pokus úspěšný? (y/n): ");
        
         return (nazev, autor, jmeno, datumPokusu, uspech);
     }
@@ -279,6 +307,9 @@ public class EvidencniSystem
         if (!lezci.Contains(novyLezec))
         {
             lezci.Add(novyLezec);
+            Console.WriteLine($"Lezec {novyLezec.Jmeno} byl vložen do evidence.");
+
+
         }
         else
         {
@@ -312,17 +343,13 @@ public class EvidencniSystem
                 Console.Write("Chceš změnit souhlas zákonného zástupce? (y/n): ");
                 if (Console.ReadLine().ToLower() == "y")
                 {
-                    Console.Write("Zadej nový souhlas (true/false): ");
-                    if (!bool.TryParse(Console.ReadLine(), out bool novySouhlas))
-                    {
-                        Console.WriteLine("Neplatný formát souhlasu.");
-                        return;
-                    }
-                    diteKEditaci.Souhlas = novySouhlas;
+                    diteKEditaci.Souhlas = ZiskejBool("Zadej nový souhlas (y/n): ");
                 }
+                Console.WriteLine("Úpravy byly úspěšně provedeny.");
+
             }
 
-            Console.WriteLine("Úpravy byly úspěšně provedeny.");
+
         }
         else
         {
@@ -409,6 +436,8 @@ public class EvidencniSystem
         if (!trasy.Contains(novaTrasa))
         {
             trasy.Add(novaTrasa);
+            Console.WriteLine($"Trasa {novaTrasa.Nazev} je vložena do evidence.");
+
         }
         else
         {
@@ -441,6 +470,9 @@ public class EvidencniSystem
                 }
 
                 trasaKEditaci.Obtiznost = novaObtiznost;
+                Console.WriteLine($"Změny byly provedeny.");
+                Console.WriteLine($"Nove vlastnosti trasy: {trasaKEditaci.Nazev}, Autor: {trasaKEditaci.Autor}, Obtížnost: {trasaKEditaci.Obtiznost}, Délka: {trasaKEditaci.Delka} m");
+
             }
 
             Console.Write("Chceš změnit délku trasy? (y/n): ");
@@ -453,9 +485,10 @@ public class EvidencniSystem
                     return;
                 }
                 trasaKEditaci.Delka = novaDelka;
-            }
+                Console.WriteLine($"Změny byly provedeny.");
+                Console.WriteLine($"Nove vlastnosti trasy: {trasaKEditaci.Nazev}, Autor: {trasaKEditaci.Autor}, Obtížnost: {trasaKEditaci.Obtiznost}, Délka: {trasaKEditaci.Delka} m");
 
-            Console.WriteLine("Úpravy byly úspěšně provedeny.");
+            }
         }
         else
         {
@@ -466,18 +499,12 @@ public class EvidencniSystem
     public static void SmazatTrasu(List<LezeckaTrasa> trasy)
     {
         Console.Write("Zadej název trasy: ");
-
         string nazev = NormalizeText(Console.ReadLine());
+
         Console.Write("Zadej autora trasy: ");
         string autor = NormalizeText(Console.ReadLine());
-        Console.Write("Zadej obtížnost trasy (B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a nebo B7b): ");
-        Obtiznost obtiznost;
-        if (!Enum.TryParse(Console.ReadLine(), out obtiznost))
-        {
-            Console.WriteLine("Neplatný formát obtížnosti.");
-            return;
-        }
-        LezeckaTrasa trasaKeSmazani = trasy.Find(trasa => trasa.Nazev == nazev && trasa.Autor == autor && trasa.Obtiznost == obtiznost);
+
+        LezeckaTrasa trasaKeSmazani = trasy.Find(trasa => trasa.Nazev == nazev && trasa.Autor == autor);
 
         if (trasaKeSmazani != null)
         {
@@ -540,7 +567,7 @@ public class EvidencniSystem
         }
         else
         {
-            Console.WriteLine("Nelze přidat pokus. Zkontrolujte, zda je trasa a lezec v systému, případně zda má dítě vyslovený souhlas zákonného zástupce s lezením.");
+            Console.WriteLine("Nelze přidat pokus. Zkontrolujte, zda jsou trasa a lezec v systému, případně zda má dítě vyslovený souhlas zákonného zástupce s lezením.");
         }
     }
 
@@ -676,7 +703,7 @@ public class EvidencniSystem
             }
             else
             {
-                Console.WriteLine($"Nejtěžší trasa lezce {jmeno} v sezanmu nenalezena.");
+                Console.WriteLine($"Nejtěžší trasa lezce {jmeno} v seznamu nenalezena.");
             }
         }
         else
