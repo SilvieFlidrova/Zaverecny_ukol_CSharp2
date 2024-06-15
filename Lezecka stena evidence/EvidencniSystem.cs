@@ -455,12 +455,12 @@ public class EvidencniSystem
     //    string jmeno = ZiskejCeleJmeno();
     //    DateTime datumNarozeni = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
 
-    //    Lezec lezecKEditaci = lezci.Find(lezec => lezec.Jmeno == jmeno && lezec.DatumNarozeni == datumNarozeni);
+    //    Lezec lezecKeSmazani = lezci.Find(lezec => lezec.Jmeno == jmeno && lezec.DatumNarozeni == datumNarozeni);
 
-    //    if (lezecKEditaci != null)
+    //    if (lezecKeSmazani != null)
     //    {
-    //        Console.WriteLine($"Lezec nalezen: {lezecKEditaci.Jmeno}, Datum narození: {lezecKEditaci.DatumNarozeni:dd.MM.yyyy}, Výška: {lezecKEditaci.Vyska} cm");
-    //        if (lezecKEditaci is Dite dite)
+    //        Console.WriteLine($"Lezec nalezen: {lezecKeSmazani.Jmeno}, Datum narození: {lezecKeSmazani.DatumNarozeni:dd.MM.yyyy}, Výška: {lezecKeSmazani.Vyska} cm");
+    //        if (lezecKeSmazani is Dite dite)
     //        {
     //            Console.WriteLine($"  Jméno zákonného zástupce: {dite.JmenoZakonnehoZastupce}, Souhlas: {dite.Souhlas}");
     //        }
@@ -468,10 +468,10 @@ public class EvidencniSystem
     //        Console.Write("Chceš změnit výšku? (y/n): ");
     //        if (Console.ReadLine().ToLower() == "y")
     //        {
-    //            lezecKEditaci.Vyska = ZiskejVysku();
+    //            lezecKeSmazani.Vyska = ZiskejVysku();
     //        }
 
-    //        if (lezecKEditaci is Dite diteKEditaci)
+    //        if (lezecKeSmazani is Dite diteKEditaci)
     //        {
     //            Console.Write("Chceš změnit souhlas zákonného zástupce? (y/n): ");
     //            if (Console.ReadLine().ToLower() == "y")
@@ -549,17 +549,30 @@ public class EvidencniSystem
     {
         string jmeno = ZiskejCeleJmeno();
         DateTime datumNarozeni = ZiskejDatum("Zadej datum narození lezce (dd.MM.yyyy): ");
-
         string key = $"{jmeno}-{datumNarozeni:dd.MM.yyyy}";
-
-        if (lezci.Remove(key))
+        
+        if (lezci.TryGetValue(key, out Lezec lezecKeSmazani))
         {
-            Console.WriteLine($"Lezec {jmeno} byl úspěšně smazán.");
+            Console.WriteLine($"Lezec nalezen: {lezecKeSmazani.Jmeno}, Datum narození: {lezecKeSmazani.DatumNarozeni:dd.MM.yyyy}, Výška: {lezecKeSmazani.Vyska} cm");
+            Console.WriteLine("Chceš lezce skutečně smazat ze seznamu? (y/n):");
+            if (Console.ReadLine().ToLower() == "y")
+            {
+                lezci.Remove(key);
+                Console.WriteLine($"Lezec {jmeno} byl úspěšně smazán.");
+            }
+
+            else
+            {
+                Console.WriteLine("Lezec nebyl smazán.");
+            }
+
         }
         else
         {
             Console.WriteLine("Tento lezec v systemu neexistuje.");
         }
+
+
     }
 
 
