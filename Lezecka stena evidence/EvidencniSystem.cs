@@ -34,7 +34,7 @@ public class EvidencniSystem
     {
         if (string.IsNullOrWhiteSpace(text))
         {
-            return "Neznámé";
+            return "Neznáme";
         }
 
         text = text.Trim();
@@ -54,13 +54,20 @@ public class EvidencniSystem
 
     public static DateTime ZiskejDatum(string prompt)
     {
-        Console.Write(prompt);
+        
         DateTime datum;
-        while (!DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datum))
+        string vstup;
+        do
         {
-            Console.WriteLine("Neplatný formát data. Zadejte prosím znovu (dd.MM.yyyy):");
-        }
-        return datum;
+            Console.Write(prompt);
+            vstup = Console.ReadLine();
+
+            if (!DateTime.TryParseExact(vstup, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datum))
+            {
+                Console.WriteLine("Neplatný formát data. Zadejte prosím znovu (dd.MM.yyyy):");
+            }
+        } while (!DateTime.TryParseExact(Console.ReadLine(), "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datum));
+            return datum;
     }
 
     public static bool ZiskejBool(string prompt)
@@ -87,7 +94,10 @@ public class EvidencniSystem
     //metody pro zadani atributu
     public static (string jmeno, string datumNarozeni, double vyska) ZadejZakladniAtributyLezce()
     {
+       
         string jmeno = ZiskejCeleJmeno();
+        
+        
         DateTime datumNarozeni = ZiskejDatum("Zadejte datum narození lezce (dd.MM.yyyy): ");
         double vyska = ZiskejVysku();
         

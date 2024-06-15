@@ -206,7 +206,7 @@ namespace Lezecka_stena_evidence
                             EvidencniSystem.PrumernaUspesnostLezce(pokusy);
                             break;
                         case "7":
-                            EvidencniSystem.NejlepsiDosaLezce(pokusy);
+                            EvidencniSystem.NejlepsiUspechLezce(pokusy, trasy);
                             break;
                         case "8":
                             EvidencniSystem.VypisPokusyNaTrasePodleLezce(pokusy);
