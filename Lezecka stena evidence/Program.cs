@@ -19,10 +19,16 @@ namespace Lezecka_stena_evidence
             string trasyFilePath = "SeznamTras.csv";
             string pokusyFilePath = "EvidencePokusu.csv";
 
-            // Načtení lezců, tras a evidence lezeckých pokusů ze souboru
-            List<Lezec> lezci = EvidencniSystem.NactiLezce(lezciFilePath);
+            // Načtení lezců, tras a evidence lezeckých pokusů ze souboru do seznamů
+            // List<Lezec> lezci = EvidencniSystem.NactiLezce(lezciFilePath);
             List<LezeckaTrasa> trasy = EvidencniSystem.NactiTrasy(trasyFilePath);
             List<LezeckyPokus> pokusy = EvidencniSystem.NactiPokusy(pokusyFilePath);
+
+            // Načtení lezců, tras a evidence lezeckých pokusů ze souboru do slovníků
+            Dictionary<string, Lezec> lezci = EvidencniSystem.NactiLezceDoSlovniku(lezciFilePath);
+            List<LezeckaTrasa> trasy = EvidencniSystem.NactiTrasy(trasyFilePath);
+            List<LezeckyPokus> pokusy = EvidencniSystem.NactiPokusy(pokusyFilePath);
+
 
             Console.WriteLine("Vítej v evidenčním systému lezeckých tras a lezců");
             Console.WriteLine("Můžeš editovat seznamy nebo požádat o výpis statistiky.");

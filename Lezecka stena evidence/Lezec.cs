@@ -35,5 +35,7 @@ namespace Lezecka_stena_evidence
         {
             return HashCode.Combine(Jmeno, DatumNarozeni, Vyska);
         }
+
+       
     }
 }

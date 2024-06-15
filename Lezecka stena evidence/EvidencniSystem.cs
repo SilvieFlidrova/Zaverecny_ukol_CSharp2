@@ -212,10 +212,41 @@ public class EvidencniSystem
     }
 
     //metody pro praci s daty
-    public static List<Lezec> NactiLezce(string lezciFilePath)
-    {
-        List<Lezec> lezci = new List<Lezec>();
+    //public static List<Lezec> NactiLezce(string lezciFilePath)
+    //{
+    //    List<Lezec> lezci = new List<Lezec>();
 
+    //    if (File.Exists(lezciFilePath))
+    //    {
+    //        try
+    //        {
+    //            foreach (var line in File.ReadAllLines(lezciFilePath))
+    //            {
+    //                var parts = line.Split(';');
+    //                DateTime datumNarozeni = DateTime.ParseExact(parts[1], "dd.MM.yyyy", CultureInfo.InvariantCulture);
+
+    //                if ((DateTime.Now - datumNarozeni).TotalDays / 365.25 >= 18) // Lezec
+    //                {
+    //                    lezci.Add(new Lezec(parts[0], parts[1], double.Parse(parts[2])));
+    //                }
+    //                else // Dite
+    //                {
+    //                    lezci.Add(new Dite(parts[0], parts[1], double.Parse(parts[2]), parts[3], bool.Parse(parts[4])));
+    //                }
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            Console.WriteLine($"Chyba při načítání lezců: {ex.Message}");
+    //        }
+    //    }
+
+    //    return lezci;
+    //}
+
+    public static Dictionary<string, Lezec> NactiLezceDoSlovniku(string lezciFilePath)
+    {
+        Dictionary<string, Lezec> lezci = new Dictionary<string, Lezec>();
         if (File.Exists(lezciFilePath))
         {
             try
@@ -225,13 +256,21 @@ public class EvidencniSystem
                     var parts = line.Split(';');
                     DateTime datumNarozeni = DateTime.ParseExact(parts[1], "dd.MM.yyyy", CultureInfo.InvariantCulture);
 
+                    Lezec lezec;
                     if ((DateTime.Now - datumNarozeni).TotalDays / 365.25 >= 18) // Lezec
                     {
-                        lezci.Add(new Lezec(parts[0], parts[1], double.Parse(parts[2])));
+                        lezec = new Lezec(parts[0], parts[1], double.Parse(parts[2]));
                     }
                     else // Dite
                     {
-                        lezci.Add(new Dite(parts[0], parts[1], double.Parse(parts[2]), parts[3], bool.Parse(parts[4])));
+                        lezec = new Dite(parts[0], parts[1], double.Parse(parts[2]), parts[3], bool.Parse(parts[4]));
+                    }
+
+                    string key = $"{ lezec.Jmeno}-{ lezec.DatumNarozeni:dd.MM.yyyy}";
+                   
+                    if (!lezci.ContainsKey(key))
+                    {
+                        lezci.Add(key, lezec);
                     }
                 }
             }
@@ -293,7 +332,42 @@ public class EvidencniSystem
         
     }
 
-    public static void PridatLezceZKonzole(List<Lezec> lezci)
+    //public static void PridatLezceZKonzole(List<Lezec> lezci)
+    //{
+    //    var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributyLezce();
+    //    DateTime datumNarozeniDate;
+    //    if (!DateTime.TryParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datumNarozeniDate))
+    //    {
+    //        Console.WriteLine("Neplatný formát data.");
+    //        return;
+    //    }
+
+    //    Lezec novyLezec;
+
+    //    if (VypocitejVek(datumNarozeniDate) < 18)
+    //    {
+    //        var (jmenoZakonnehoZastupce, souhlas) = ZadejDoplnujiciAtributyLezce();
+    //        novyLezec = new Dite(jmeno, datumNarozeni, vyska, jmenoZakonnehoZastupce, souhlas);
+    //    }
+    //    else
+    //    {
+    //        novyLezec = new Lezec(jmeno, datumNarozeni, vyska);
+    //    }
+
+    //    if (!lezci.Contains(novyLezec))
+    //    {
+    //        lezci.Add(novyLezec);
+    //        Console.WriteLine($"Lezec {novyLezec.Jmeno} byl vložen do evidence.");
+
+
+    //    }
+    //    else
+    //    {
+    //        Console.WriteLine("Tento lezec už je v systemu zaevidovany.");
+    //    }
+    //}
+
+    public static void PridatLezceZKonzole(Dictionary<string, Lezec> lezci)
     {
         var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributyLezce();
         DateTime datumNarozeniDate;
@@ -315,9 +389,11 @@ public class EvidencniSystem
             novyLezec = new Lezec(jmeno, datumNarozeni, vyska);
         }
 
-        if (!lezci.Contains(novyLezec))
+        string key = $"{novyLezec.Jmeno}-{novyLezec.DatumNarozeni:dd.MM.yyyy}";
+
+        if (!lezci.ContainsKey(key))
         {
-            lezci.Add(novyLezec);
+            lezci.Add(key, novyLezec);
             Console.WriteLine($"Lezec {novyLezec.Jmeno} byl vložen do evidence.");
 
 
