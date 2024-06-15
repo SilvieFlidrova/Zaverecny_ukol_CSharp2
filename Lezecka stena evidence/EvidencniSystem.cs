@@ -196,21 +196,24 @@ public class EvidencniSystem
 
     public static (string nazev, string autor, string jmeno, DateTime datumPokusu, bool uspech) ZadejZakladniAtributyPokusu()
     {
+        DateTime datumPokusu = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
+
         Console.Write("Zadej název trasy: ");
         string nazev = NormalizeText(Console.ReadLine());
 
         Console.Write("Zadej jméno autora trasy: ");
         string autor = NormalizeText(Console.ReadLine());
 
+        bool uspech = ZiskejBool("Byl pokus úspěšný? (y/n): ");
+
         string jmeno = ZiskejCeleJmeno();
 
-        DateTime datumPokusu = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
-
-        bool uspech = ZiskejBool("Byl pokus úspěšný? (y/n): ");
+        datumPokusu = datumPokusu.Add(DateTime.Now.TimeOfDay);
 
         return (nazev, autor, jmeno, datumPokusu, uspech);
     }
 
+   
     /*metody pro praci s daty*/
     /* práce s lezcem*/
 
@@ -381,8 +384,8 @@ public class EvidencniSystem
     //public static void PridatLezceZKonzole(List<Lezec> lezci)
     //{
     //    var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributyLezce();
-    //    DateTime datumNarozeniDate;
-    //    if (!DateTime.TryParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datumNarozeniDate))
+    //    DateTime datumPokusuDate;
+    //    if (!DateTime.TryParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datumPokusuDate))
     //    {
     //        Console.WriteLine("Neplatný formát data.");
     //        return;
@@ -390,7 +393,7 @@ public class EvidencniSystem
 
     //    Lezec novyLezec;
 
-    //    if (VypocitejVek(datumNarozeniDate) < 18)
+    //    if (VypocitejVek(datumPokusuDate) < 18)
     //    {
     //        var (jmenoZakonnehoZastupce, souhlas) = ZadejDoplnujiciAtributyLezce();
     //        novyLezec = new Dite(jmeno, datumNarozeni, vyska, jmenoZakonnehoZastupce, souhlas);
@@ -988,35 +991,39 @@ public class EvidencniSystem
     //}
     public static void PridatPokusZKonzole(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, Lezec> lezci)
     {
+      
         var (nazev, autor, jmeno, datumPokusu, uspech) = ZadejZakladniAtributyPokusu();
-
+        DateTime datumNarozeni = ZiskejDatum("Zadej datum narozeni lezce (dd.MM.yyyy): ");
         if (!trasy.ContainsKey(nazev))
         {
-            Console.WriteLine($"Trasa s názvem {nazev} neexistuje, nejprve ji musíš vložit do seznau tras.");
+            Console.WriteLine($"Trasa s názvem {nazev} neexistuje, nejprve ji musíš vložit do seznamu tras.");
             return;
         }
 
-        if (!lezci.ContainsKey(jmeno))
+        // Vyhledání lezce podle kombinace jména a data narození
+        string lezecKey = lezci.Keys.FirstOrDefault(key => key.StartsWith(jmeno));
+        if (lezecKey == null)
         {
-            Console.WriteLine($"Lezec s jménem {jmeno} neexistuje, nejprve ho musíš vložit do seznau lezců.");
+            Console.WriteLine($"Lezec s jménem {jmeno} neexistuje, nejprve ho musíš vložit do seznamu lezců.");
             return;
         }
 
         LezeckaTrasa trasa = trasy[nazev];
-        Lezec lezec = lezci[jmeno];
+        Lezec lezec = lezci[lezecKey];
 
         if (lezec is Dite dite && !dite.Souhlas)
         {
             Console.WriteLine($"Dítě {jmeno} nemá souhlas zákonného zástupce k lezení.");
             return;
         }
-        string keyPokus = $"{nazev}-{jmeno}-{datumPokusu:dd.MM.yyyy-HH.mm}";
+
+        // Generování unikátního klíče pro každý pokus pomocí časového otisku
+        string keyPokus = $"{nazev}-{jmeno}-{datumPokusu:dd.MM.yyyy-HH.mm.ss.fff}";
 
         LezeckyPokus novyPokus = new LezeckyPokus(nazev, autor, jmeno, datumPokusu, uspech);
         pokusy.Add(keyPokus, novyPokus);
         Console.WriteLine("Lezecký pokus úspěšně přidán.");
     }
-
 
     //public static void SmazatPokus(List<LezeckyPokus> pokusy)
     //{
