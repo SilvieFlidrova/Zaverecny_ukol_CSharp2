@@ -492,7 +492,7 @@ public class EvidencniSystem
     public static void EditovatLezce(Dictionary<string, Lezec> lezci)
     {
         string jmeno = ZiskejCeleJmeno();
-        DateTime datumNarozeni = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
+        DateTime datumNarozeni = ZiskejDatum("Zadej datum narození (dd.MM.yyyy): ");
         string key = $"{jmeno}-{datumNarozeni:dd.MM.yyyy}";
 
         if (lezci.TryGetValue(key, out Lezec lezecKEditaci))

@@ -125,14 +125,13 @@ namespace Lezecka_stena_evidence
                     case "3":
                         EvidencniSystem.SmazatLezce(lezci);
                         break;
-                    case "X":
-                    case "x":
-                        return;
                     default:
+                        Console.WriteLine("Neplatný výběr.");
+
                         break;
                 }
                 EvidencniSystem.UlozLezce(lezciFilePath, lezci);
-                Console.WriteLine("Úpravy byly úspěšně provedeny.");
+               
             }
             catch (Exception ex)
             {
@@ -155,14 +154,11 @@ namespace Lezecka_stena_evidence
                     case "3":
                         EvidencniSystem.SmazatTrasu(trasy);
                         break;
-                    case "X":
-                    case "x":
-                        return;
                     default:
+                        Console.WriteLine("Neplatný výběr.");
                         break;
                 }
                 EvidencniSystem.UlozTrasy(trasyFilePath, trasy);
-                Console.WriteLine("Úpravy byly úspěšně provedeny.");
             }
             catch (Exception ex)
             {
@@ -186,10 +182,8 @@ namespace Lezecka_stena_evidence
                         EvidencniSystem.SmazatPokus(pokusy);
                         Console.WriteLine("Úpravy byly úspěšně provedeny.");
                         break;
-                    case "X":
-                    case "x":
-                        return;
                     default:
+                        Console.WriteLine("Neplatný výběr.");
                         break;
                 }
                 EvidencniSystem.UlozPokusy(pokusyFilePath, pokusy);
