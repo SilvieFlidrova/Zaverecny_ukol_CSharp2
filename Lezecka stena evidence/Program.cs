@@ -65,31 +65,48 @@ namespace Lezecka_stena_evidence
             bool editaceBezi = true;
             while (editaceBezi)
             {
-                Console.WriteLine("V rámci práce se záznamy můžeš pracovat se seznamem lezců (1), seznamem lezeckých tras (2) nebo evidencí lezeckých pokusů (3):");
+                Console.WriteLine($"V rámci práce se záznamy můžeš pracovat se:");
+                Console.WriteLine($"1 - seznamem lezců");
+                Console.WriteLine($"2 - seznamem lezeckých tras");
+                Console.WriteLine($"3 - evidencí lezeckých pokusů");
                 string volbaSeznamu = Console.ReadLine();
-                if (volbaSeznamu.ToUpper() == "X") return;
+                string volbaUkonu;
+                try
+                {
+                    switch (volbaSeznamu)
+                    {
+                        case "1":
+                            volbaUkonu = EvidencniSystem.DejNaVyber();
+                            EditaceLezcu(lezci, volbaUkonu, lezciFilePath);
+                            break;
+                        case "2":
+                            volbaUkonu = EvidencniSystem.DejNaVyber();
+                            EditaceTras(trasy, volbaUkonu, trasyFilePath);
+                            break;
+                        case "3":
+                            volbaUkonu = EvidencniSystem.DejNaVyber();
+                            EditacePokusů(pokusy, trasy, lezci, volbaUkonu, pokusyFilePath);
+                            break;
+                        default:
+                            Console.WriteLine("Neplatný výběr.");
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Chyba při práci se seznamy: {ex.Message}");
+                }
 
-                string volbaUkonu = EvidencniSystem.DejNaVyber();
-                switch (volbaSeznamu)
+                if (editaceBezi)
                 {
-                    case "1":
-                        EditaceLezcu(lezci, volbaUkonu, lezciFilePath);
-                        break;
-                    case "2":
-                        EditaceTras(trasy, volbaUkonu, trasyFilePath);
-                        break;
-                    case "3":
-                        EditacePokusů(pokusy, trasy, lezci, volbaUkonu, pokusyFilePath);
-                        break;
-                    default:
-                        Console.WriteLine("Neplatný výběr.");
-                        break;
+                    Console.WriteLine("Chceš pokračovat v práci se seznamy? (y/n)");
+                    if (Console.ReadLine().ToLower() != "y")
+                    {
+                        editaceBezi = false;
+                    }
                 }
-                Console.WriteLine("Chceš pokračovat v editaci? (y/n)");
-                if (Console.ReadLine().ToLower() != "y")
-                {
-                    editaceBezi = false;
-                }
+                
+                
             }
         }
 
@@ -204,7 +221,6 @@ namespace Lezecka_stena_evidence
                 Console.WriteLine($"13 - seznam tras podle autora");
                 Console.WriteLine($"14 - seznam tras podle obtížnosti");
                 Console.WriteLine($"15 - seznam tras podle názvu");
-                Console.WriteLine($"Pokud chceš vyskočit ze statistik, zadej Z:");
 
                 string volbaStatistiky = Console.ReadLine();
                 try
@@ -257,10 +273,6 @@ namespace Lezecka_stena_evidence
                             EvidencniSystem.VypisTrasyPodleNazvu(trasy);
                             break;
 
-                        case "Z":
-                        case "z":
-                            zobrazeniBezi = false;
-                            break;
                         default:
                             Console.WriteLine("Neplatný výběr.");
                             break;
