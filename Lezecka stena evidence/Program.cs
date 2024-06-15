@@ -21,13 +21,13 @@ namespace Lezecka_stena_evidence
 
             // Načtení lezců, tras a evidence lezeckých pokusů ze souboru do seznamů
             // List<Lezec> lezci = EvidencniSystem.NactiLezce(lezciFilePath);
-            List<LezeckaTrasa> trasy = EvidencniSystem.NactiTrasy(trasyFilePath);
-            List<LezeckyPokus> pokusy = EvidencniSystem.NactiPokusy(pokusyFilePath);
+            // List<LezeckaTrasa> trasy = EvidencniSystem.NactiTrasy(trasyFilePath);
+            // List<LezeckyPokus> pokusy = EvidencniSystem.NactiPokusy(pokusyFilePath);
 
             // Načtení lezců, tras a evidence lezeckých pokusů ze souboru do slovníků
             Dictionary<string, Lezec> lezci = EvidencniSystem.NactiLezceDoSlovniku(lezciFilePath);
-            List<LezeckaTrasa> trasy = EvidencniSystem.NactiTrasy(trasyFilePath);
-            List<LezeckyPokus> pokusy = EvidencniSystem.NactiPokusy(pokusyFilePath);
+            Dictionary<string, LezeckaTrasa> trasy = EvidencniSystem.NactiTrasyDoSlovniku(trasyFilePath);
+            Dictionary<string, LezeckyPokus> pokusy = EvidencniSystem.NactiPokusyDoSlovniku(pokusyFilePath);
 
 
             Console.WriteLine("Vítej v evidenčním systému lezeckých tras a lezců");
