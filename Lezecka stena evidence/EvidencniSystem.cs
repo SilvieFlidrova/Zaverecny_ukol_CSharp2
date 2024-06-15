@@ -17,9 +17,20 @@ public class EvidencniSystem
 
     public static string ZiskejCeleJmeno()
     {
-        string krestniJmeno = ZiskejJmeno("Zadejte křestní jméno lezce: ");
-        string prijmeni = ZiskejJmeno("Zadejte příjmení lezce: ");
-        return $"{krestniJmeno} {prijmeni}";
+        string krestniJmeno;
+        string prijmeni;
+        do
+        {
+            krestniJmeno = ZiskejJmeno("Zadejte křestní jméno lezce: ");
+            prijmeni = ZiskejJmeno("Zadejte příjmení lezce: ");
+
+            if (string.IsNullOrWhiteSpace(krestniJmeno) && string.IsNullOrWhiteSpace(prijmeni))
+            {
+                Console.WriteLine("Musíš zadat jméno nebo příjmení.");
+            }
+        } while (string.IsNullOrWhiteSpace(krestniJmeno) && string.IsNullOrWhiteSpace(prijmeni));
+
+        return $"{krestniJmeno} {prijmeni}".Trim();
     }
 
     public static string ZiskejJmeno(string prompt)
@@ -34,11 +45,14 @@ public class EvidencniSystem
     {
         if (string.IsNullOrWhiteSpace(text))
         {
-            return "Neznáme";
+            return default;
         }
-
+         else
+        {
         text = text.Trim();
         return char.ToUpper(text[0]) + text.Substring(1).ToLower();
+        }
+        
     }
 
     public static double ZiskejVysku()
@@ -53,6 +67,7 @@ public class EvidencniSystem
     }
 
     public static DateTime ZiskejDatum(string prompt)
+
     {
         
         DateTime datum;
@@ -116,8 +131,17 @@ public class EvidencniSystem
 
     public static (string nazev, string autor, Obtiznost obtiznost, double delka) ZadejZakladniAtributyTrasy()
     {
-        Console.Write("Zadej název trasy: ");
-        string nazev = NormalizeText(Console.ReadLine());
+        string nazev;
+        do
+        {
+            Console.Write("Zadej název trasy: ");
+            nazev = NormalizeText(Console.ReadLine());
+            if (string.IsNullOrWhiteSpace(nazev))
+            {
+                Console.WriteLine("Název trasy je povinný, musiš ho zadat.");
+            }
+        } while (string.IsNullOrWhiteSpace(nazev));
+       
         Console.Write("Zadej autora trasy: ");
         string autor = NormalizeText(Console.ReadLine());
 

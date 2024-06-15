@@ -9,7 +9,7 @@ namespace Lezecka_stena_evidence
 {
     // Výčtový typ pro obtížnost lezeckých cest
     public enum Obtiznost
-    { B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a, B7b };
+    { B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a, B7b, neznámá};
 
     class Program
     {
