@@ -48,6 +48,7 @@ namespace Lezecka_stena_evidence
                 {
                     EditaceSeznamu(lezci, trasy, pokusy, lezciFilePath, trasyFilePath, pokusyFilePath);
                 }
+
                 else if (volbaZakladni == "2")
                 {
                     ZobrazeniStatistik(lezci, trasy, pokusy);
@@ -59,7 +60,7 @@ namespace Lezecka_stena_evidence
             }
         }
 
-        static void EditaceSeznamu(List<Lezec> lezci, List<LezeckaTrasa> trasy, List<LezeckyPokus> pokusy, string lezciFilePath, string trasyFilePath, string pokusyFilePath)
+        static void EditaceSeznamu(Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string,LezeckyPokus> pokusy, string lezciFilePath, string trasyFilePath, string pokusyFilePath)
         {
             bool editaceBezi = true;
             while (editaceBezi)
@@ -92,7 +93,7 @@ namespace Lezecka_stena_evidence
             }
         }
 
-        static void EditaceLezcu(List<Lezec> lezci, string volbaUkonu, string lezciFilePath)
+        static void EditaceLezcu(Dictionary<string, Lezec> lezci, string volbaUkonu, string lezciFilePath)
         {
             try
             {
@@ -122,7 +123,7 @@ namespace Lezecka_stena_evidence
             }
         }
 
-        static void EditaceTras(List<LezeckaTrasa> trasy, string volbaUkonu, string trasyFilePath)
+        static void EditaceTras(Dictionary<string, LezeckaTrasa> trasy, string volbaUkonu, string trasyFilePath)
         {
             try
             {
@@ -152,7 +153,7 @@ namespace Lezecka_stena_evidence
             }
         }
 
-        static void EditacePokusů(List<LezeckyPokus> pokusy, List<LezeckaTrasa> trasy, List<Lezec> lezci, string volbaUkonu, string pokusyFilePath)
+        static void EditacePokusů(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, Lezec> lezci, string volbaUkonu, string pokusyFilePath)
         {
             try
             {
@@ -182,7 +183,7 @@ namespace Lezecka_stena_evidence
             }
         }
 
-        static void ZobrazeniStatistik(List<Lezec> lezci, List<LezeckaTrasa> trasy, List<LezeckyPokus> pokusy)
+        static void ZobrazeniStatistik(Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, LezeckyPokus> pokusy)
         {
             bool zobrazeniBezi = true;
             while (zobrazeniBezi)
@@ -190,20 +191,19 @@ namespace Lezecka_stena_evidence
                 Console.WriteLine($"Chceš zobrazit:");
                 Console.WriteLine($"1 - seznam lezců");
                 Console.WriteLine($"2 - seznam lezeckých tras");
-                Console.WriteLine($"3 - záznamy lezení");
-                Console.WriteLine($"4 - záznamy lezení lezce podle tras");
-                Console.WriteLine($"5 - záznamy lezení lezce podle data");
-                Console.WriteLine($"6 - průměrná úspěšnost lezce");
-                Console.WriteLine($"7 - nejtěžší trasa lezce");
-                Console.WriteLine($"8 - záznamy lezení na trase podle lezců");
-                Console.WriteLine($"9 - záznamy lezení na trase podle data");
-                Console.WriteLine($"10 - průměrná úspěšnost trasy");
-                Console.WriteLine($"11 - počet evidovaných tras");
-                Console.WriteLine($"12 - počet evidovaných lezců");
+                Console.WriteLine($"3 - počet evidovaných tras");
+                Console.WriteLine($"4 - počet evidovaných lezců");
+                Console.WriteLine($"5 - záznamy lezení lezce podle tras");
+                Console.WriteLine($"6 - záznamy lezení lezce podle data");
+                Console.WriteLine($"7 - průměrná úspěšnost lezce");
+                Console.WriteLine($"8 - nejtěžší trasa lezce");
+                Console.WriteLine($"9 - záznamy lezení na trase podle lezců");
+                Console.WriteLine($"10 - záznamy lezení na trase podle data");
+                Console.WriteLine($"11 - průměrná úspěšnost trasy");
+                Console.WriteLine($"12 - nejmenší úspěšný lezec na trase");
                 Console.WriteLine($"13 - seznam tras podle autora");
                 Console.WriteLine($"14 - seznam tras podle obtížnosti");
                 Console.WriteLine($"15 - seznam tras podle názvu");
-                Console.WriteLine($"16 - nejmenší úspěšný lezec na trase");
                 Console.WriteLine($"Pokud chceš vyskočit ze statistik, zadej Z:");
 
                 string volbaStatistiky = Console.ReadLine();
@@ -218,34 +218,34 @@ namespace Lezecka_stena_evidence
                             EvidencniSystem.VypisTrasy(trasy);
                             break;
                         case "3":
-                            EvidencniSystem.VypisLezeckePokusy(pokusy);
-                            break;
-                        case "4":
-                            EvidencniSystem.VypisPokusyLezcePodleTrasy(pokusy);
-                            break;
-                        case "5":
-                            EvidencniSystem.VypisPokusyLezcePodleData(pokusy);
-                            break;
-                        case "6":
-                            EvidencniSystem.PrumernaUspesnostLezce(pokusy);
-                            break;
-                        case "7":
-                            EvidencniSystem.NejlepsiUspechLezce(pokusy, trasy);
-                            break;
-                        case "8":
-                            EvidencniSystem.VypisPokusyNaTrasePodleLezce(pokusy);
-                            break;
-                        case "9":
-                            EvidencniSystem.VypisPokusyNaTrasePodleData(pokusy);
-                            break;
-                        case "10":
-                            EvidencniSystem.PrumernaUspesnostTrasy(pokusy);
-                            break;
-                        case "11":
                             Console.WriteLine($"Počet všech evidovaných tras: {trasy.Count}");
                             break;
-                        case "12":
+                        case "4":
                             Console.WriteLine($"Počet všech evidovaných lezců: {lezci.Count}");
+                            break;
+                        case "5":
+                            EvidencniSystem.VypisPokusyLezcePodleTrasy(pokusy);
+                            break;
+                        case "6":
+                            EvidencniSystem.VypisPokusyLezcePodleData(pokusy);
+                            break;
+                        case "7":
+                            EvidencniSystem.PrumernaUspesnostLezce(pokusy);
+                            break;
+                        case "8":
+                            EvidencniSystem.NejlepsiUspechLezce(pokusy, trasy);
+                            break;
+                        case "9":
+                            EvidencniSystem.VypisPokusyNaTrasePodleLezce(pokusy);
+                            break;
+                        case "10":
+                            EvidencniSystem.VypisPokusyNaTrasePodleData(pokusy);
+                            break;
+                        case "11":
+                            EvidencniSystem.PrumernaUspesnostTrasy(pokusy);
+                            break;
+                        case "12":
+                            EvidencniSystem.VypisNejmensihoUspesnehoLezceNaTrase(pokusy, lezci);
                             break;
                         case "13":
                             EvidencniSystem.VypisTrasyPodleAutora(trasy);
@@ -255,9 +255,6 @@ namespace Lezecka_stena_evidence
                             break;
                         case "15":
                             EvidencniSystem.VypisTrasyPodleNazvu(trasy);
-                            break;
-                        case "16":
-                            EvidencniSystem.VypisNejmensihoUspesnehoLezceNaTrase(pokusy, lezci);
                             break;
 
                         case "Z":
