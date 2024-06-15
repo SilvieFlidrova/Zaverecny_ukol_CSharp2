@@ -181,7 +181,24 @@ namespace Lezecka_stena_evidence
             bool zobrazeniBezi = true;
             while (zobrazeniBezi)
             {
-                Console.WriteLine($"Chceš zobrazit: seznam lezců (1), seznam lezeckých tras (2), záznamy lezení (3), záznamy lezení lezce podle tras (4), záznamy lezení lezce podle data (5), průměrná úspěšnost lezce (6), nejtěžší trasa lezce (7), záznamy lezení na trase podle lezců (8), záznamy lezení na trase podle data (9), průměrná úspěšnost trasy (10), počet evidovaných tras (11), počet evidovaných lezců (12), seznam tras podle autora (13), seznam tras podle obtížnosti (14), seznam tras podle názvu (15). Pokud chceš vyskočit ze statistik, zadej Z:");
+                Console.WriteLine($"Chceš zobrazit:");
+                Console.WriteLine($"1 - seznam lezců");
+                Console.WriteLine($"2 - seznam lezeckých tras");
+                Console.WriteLine($"3 - záznamy lezení");
+                Console.WriteLine($"4 - záznamy lezení lezce podle tras");
+                Console.WriteLine($"5 - záznamy lezení lezce podle data");
+                Console.WriteLine($"6 - průměrná úspěšnost lezce");
+                Console.WriteLine($"7 - nejtěžší trasa lezce");
+                Console.WriteLine($"8 - záznamy lezení na trase podle lezců");
+                Console.WriteLine($"9 - záznamy lezení na trase podle data");
+                Console.WriteLine($"10 - průměrná úspěšnost trasy");
+                Console.WriteLine($"11 - počet evidovaných tras");
+                Console.WriteLine($"12 - počet evidovaných lezců");
+                Console.WriteLine($"13 - seznam tras podle autora");
+                Console.WriteLine($"14 - seznam tras podle obtížnosti");
+                Console.WriteLine($"15 - seznam tras podle názvu");
+                Console.WriteLine($"Pokud chceš vyskočit ze statistik, zadej Z:");
+
                 string volbaStatistiky = Console.ReadLine();
                 try
                 {
