@@ -180,16 +180,15 @@ public class EvidencniSystem
         Obtiznost obtiznost;
         if (string.IsNullOrEmpty(obtiznostStr) || !Enum.TryParse(obtiznostStr, out obtiznost))
         {
-            Console.WriteLine("Neplatný formát obtížnosti.");
-            return default;
+            obtiznost = Obtiznost.neznámá;
         }
 
         Console.Write("Zadej délku trasy (v m): ");
+        string delkaStr = Console.ReadLine();
         double delka;
-        if (!double.TryParse(Console.ReadLine(), out delka))
+        if (string.IsNullOrEmpty(delkaStr) || !double.TryParse(delkaStr, out delka))
         {
-            Console.WriteLine("Neplatný formát délky.");
-            return default;
+            delka = 0;
         }
 
         return (nazev, autor, obtiznost, delka);
@@ -852,15 +851,30 @@ public class EvidencniSystem
     {
         Console.Write("Zadej název trasy: ");
         string nazev = NormalizeText(Console.ReadLine());
+        string key = $"{nazev}";
 
-        if (trasy.Remove(nazev))
+        if (trasy.TryGetValue(key, out LezeckaTrasa trasaKeSmazani))
         {
-            Console.WriteLine($"Trasa {nazev} byla úspěšně smazána.");
+            Console.WriteLine($"Trasa nalezena: {trasaKeSmazani.Nazev}, Autor: {trasaKeSmazani.Autor}, Obtížnost: {trasaKeSmazani.Obtiznost}, Délka: {trasaKeSmazani.Delka} m");
+            Console.WriteLine("Chceš trasu skutečně smazat ze seznamu? (y/n):");
+            if (Console.ReadLine().ToLower() == "y")
+            {
+                trasy.Remove(key);
+                Console.WriteLine($"Trasa {nazev} byla úspěšně smazána.");
+            }
+
+            else
+            {
+                Console.WriteLine("Trasa nebyla smazána.");
+            }
+
         }
         else
         {
             Console.WriteLine("Tato trasa v systemu neexistuje.");
         }
+       
+
     }
 
     /* prace s pokusy*/
