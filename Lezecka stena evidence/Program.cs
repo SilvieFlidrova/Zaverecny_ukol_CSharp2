@@ -197,6 +197,7 @@ namespace Lezecka_stena_evidence
                 Console.WriteLine($"13 - seznam tras podle autora");
                 Console.WriteLine($"14 - seznam tras podle obtížnosti");
                 Console.WriteLine($"15 - seznam tras podle názvu");
+                Console.WriteLine($"16 - nejmenší úspěšný lezec na trase");
                 Console.WriteLine($"Pokud chceš vyskočit ze statistik, zadej Z:");
 
                 string volbaStatistiky = Console.ReadLine();
@@ -249,6 +250,10 @@ namespace Lezecka_stena_evidence
                         case "15":
                             EvidencniSystem.VypisTrasyPodleNazvu(trasy);
                             break;
+                        case "16":
+                            EvidencniSystem.VypisNejmensihoUspesnehoLezceNaTrase(pokusy, lezci);
+                            break;
+
                         case "Z":
                         case "z":
                             zobrazeniBezi = false;
