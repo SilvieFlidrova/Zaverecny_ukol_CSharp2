@@ -255,7 +255,7 @@ namespace Lezecka_stena_evidence
                             EvidencniSystem.PrumernaUspesnostTrasy(pokusy);
                             break;
                         case "12":
-                            EvidencniSystem.VypisNejmensihoUspesnehoLezceNaTrase(pokusy, lezci);
+                            EvidencniSystem.VypisNejmensihoUspesnehoLezceNaTrase(pokusy, lezci, trasy);
                             break;
                         case "13":
                             EvidencniSystem.VypisTrasyPodleAutora(trasy);

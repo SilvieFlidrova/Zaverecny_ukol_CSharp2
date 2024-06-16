@@ -1305,7 +1305,7 @@ public class EvidencniSystem
         }
 
         Console.Write("Zadej název trasy: ");
-        string nazevTrasy = Console.ReadLine();
+        string nazevTrasy = NormalizeText(Console.ReadLine());
         var pokusyNaTrase = pokusy.Values.Where(p => p.Nazev == nazevTrasy).OrderBy(p => p.Jmeno).ToList();
 
         if (pokusyNaTrase.Any())
@@ -1356,7 +1356,7 @@ public class EvidencniSystem
         }
 
         Console.Write("Zadej název trasy: ");
-        string nazevTrasy = Console.ReadLine();
+        string nazevTrasy = NormalizeText(Console.ReadLine());
         var pokusyNaTrase = pokusy.Values.Where(p => p.Nazev == nazevTrasy).OrderBy(p => p.DatumPokusu).ToList();
 
         if (pokusyNaTrase.Any())
@@ -1525,13 +1525,13 @@ public class EvidencniSystem
     //public static void VypisNejmensihoUspesnehoLezceNaTrase (List<LezeckyPokus> pokusy, List<Lezec> lezci)
     //{
     //    Console.WriteLine("Zadej názec trasy: ");
-    //    string nazecTrasy = NormalizeText(Console.ReadLine());
+    //    string nazevTrasy = NormalizeText(Console.ReadLine());
 
-    //    var uspesnePokusyNaTrase = pokusy.Where(p => p.Nazev == nazecTrasy && p.Uspech).ToList();
+    //    var uspesnePokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy && p.Uspech).ToList();
 
     //    if (!uspesnePokusyNaTrase.Any())
     //    {
-    //        Console.WriteLine($"Na trase {nazecTrasy} nejsou evidovány žádné úspěšné pokusy.");
+    //        Console.WriteLine($"Na trase {nazevTrasy} nejsou evidovány žádné úspěšné pokusy.");
     //        return;
     //    }
 
@@ -1551,50 +1551,51 @@ public class EvidencniSystem
 
     //    if (nejmensiLezec != null)
     //    {
-    //        Console.WriteLine($"Nejmenší lezec, který zdolal trasu {nazecTrasy} je {nejmensiLezec.Jmeno} s výškou {nejmensiLezec.Vyska} cm.");
+    //        Console.WriteLine($"Nejmenší lezec, který zdolal trasu {nazevTrasy} je {nejmensiLezec.Jmeno} s výškou {nejmensiLezec.Vyska} cm.");
     //    }
     //    else
     //    {
-    //        Console.WriteLine($"Na trase {nazecTrasy} nejsou evidovány žádné úspěšné pokusy.");
+    //        Console.WriteLine($"Na trase {nazevTrasy} nejsou evidovány žádné úspěšné pokusy.");
 
     //    }
 
     //}
-    public static void VypisNejmensihoUspesnehoLezceNaTrase(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, Lezec> lezci)
+    public static void VypisNejmensihoUspesnehoLezceNaTrase(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, Lezec> lezci, Dictionary<String, LezeckaTrasa> trasy)
     {
         Console.WriteLine("Zadej názec trasy: ");
-        string nazecTrasy = NormalizeText(Console.ReadLine());
+        string nazevTrasy = NormalizeText(Console.ReadLine());
 
-        var uspesnePokusyNaTrase = pokusy.Values.Where(p => p.Nazev == nazecTrasy && p.Uspech).ToList();
+        if (!trasy.ContainsKey (nazevTrasy))
+        {
+            Console.WriteLine($"Trasa {nazevTrasy} v seznamu neexistuje.");
+            return;
+        }
+        
+        var uspesnePokusyNaTrase = pokusy.Values.Where(p => p.Nazev == nazevTrasy && p.Uspech).ToList();
 
         if (!uspesnePokusyNaTrase.Any())
         {
-            Console.WriteLine($"Na trase {nazecTrasy} nejsou evidovány žádné úspěšné pokusy.");
+            Console.WriteLine($"Na trase {nazevTrasy} nejsou evidovány žádné úspěšné pokusy.");
             return;
         }
 
-        Lezec nejmensiLezec = null;
+        var uspesniLezciNaTrase = uspesnePokusyNaTrase
+            .Select(p => lezci.Values.FirstOrDefault(l => l.Jmeno == p.Jmeno))
+            .Where(l => l != null)
+            .OrderBy(l => l.Vyska)
+            .ToList();
 
-        foreach (var pokus in uspesnePokusyNaTrase)
+
+        if (uspesniLezciNaTrase.Any())
         {
-            string key = $"{pokus.Jmeno}-{pokus.DatumPokusu:dd.MM.yyyy}";
-            if (lezci.TryGetValue(key, out Lezec lezec))
-            {
-
-                if (nejmensiLezec == null || lezec.Vyska < nejmensiLezec.Vyska)
-                {
-                    nejmensiLezec = lezec;
-                }
-            }
+            var nejmensiLezec = uspesniLezciNaTrase.First();
+            Console.WriteLine($"Nejmenší lezec, který zdolal trasu {nazevTrasy} je {nejmensiLezec.Jmeno} s výškou {nejmensiLezec.Vyska} cm.");
+            return;
         }
-
-        if (nejmensiLezec != null)
-        {
-            Console.WriteLine($"Nejmenší lezec, který zdolal trasu {nazecTrasy} je {nejmensiLezec.Jmeno} s výškou {nejmensiLezec.Vyska} cm.");
-        }
+                
         else
         {
-            Console.WriteLine($"Na trase {nazecTrasy} nejsou evidovány žádné úspěšné pokusy.");
+            Console.WriteLine($"Na trase {nazevTrasy} nejsou evidovány žádné úspěšné pokusy.");
 
         }
 
