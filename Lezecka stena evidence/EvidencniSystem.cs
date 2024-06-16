@@ -578,7 +578,7 @@ public static double ZiskejVysku()
 
     /* prace s pokusy*/
 
-    public static Dictionary<string, LezeckyPokus> NactiPokusyDoSlovniku(string pokusyFilePath)
+    /* public static Dictionary<string, LezeckyPokus> NactiPokusyDoSlovniku(string pokusyFilePath)
     {
         Dictionary<string, LezeckyPokus> pokusy = new Dictionary<string, LezeckyPokus>();
         if (File.Exists(pokusyFilePath))
@@ -605,9 +605,32 @@ public static double ZiskejVysku()
         }
 
         return pokusy;
+    } */
+
+    public static List<LezeckyPokus> NactiPokusyDoSeznamu(string filePath)
+    {
+        List<LezeckyPokus> pokusy = new List<LezeckyPokus>();
+
+        if (File.Exists(filePath))
+        {
+            try
+            {
+                foreach (var line in File.ReadAllLines(filePath))
+                {
+                    var parts = line.Split(';');
+                    pokusy.Add(new LezeckyPokus(parts[0], parts[1], parts[2], DateTime.ParseExact(parts[3], "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture), bool.Parse(parts[4])));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Chyba při načítání pokusů: {ex.Message}");
+            }
+        }
+
+        return pokusy;
     }
 
-    public static void UlozPokusy(string filePath, Dictionary<string, LezeckyPokus> pokusy)
+    /* public static void UlozPokusy(string filePath, Dictionary<string, LezeckyPokus> pokusy)
     {
         List<string> lines = new List<string>();
 
@@ -624,9 +647,21 @@ public static double ZiskejVysku()
         {
             Console.WriteLine($"Chyba při ukládání pokusů: {ex.Message}");
         }
+    }*/
+
+    public static void UlozPokusy(string filePath, List<LezeckyPokus> pokusy)
+    {
+        List<string> lines = new List<string>();
+
+        foreach (var pokus in pokusy)
+        {
+            lines.Add($"{pokus.Nazev};{pokus.Autor};{pokus.Jmeno};{pokus.DatumPokusu:dd.MM.yyyy HH:mm:ss};{pokus.Uspech}");
+        }
+
+        File.WriteAllLines(filePath, lines);
     }
 
-    public static void PridatPokusZKonzole(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, Lezec> lezci)
+    /* public static void PridatPokusZKonzole(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, Lezec> lezci)
     {
         var (nazev, autor) = ZiskejTrasu();
 
@@ -667,15 +702,116 @@ public static double ZiskejVysku()
         pokusy.Add(keyPokus, novyPokus);
         Console.WriteLine("Lezecký pokus úspěšně přidán.");
     }
+    */
 
-    public static void SmazatPokus(Dictionary<string,LezeckyPokus> pokusy)
+    public static void PridatPokusZKonzole(List<LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, Lezec> lezci)
+    {
+        var (nazev, autor) = ZiskejTrasu();
+
+        if (!trasy.ContainsKey(nazev))
+        {
+            Console.WriteLine($"Trasa s názvem {nazev} neexistuje, nejprve ji musíš vložit do seznamu tras.");
+            return;
+        }
+
+        string jmeno = ZiskejCeleJmeno();
+        DateTime datumNarozeni = ZiskejDatum("Zadej datum narozeni lezce (dd.MM.yyyy): ");
+
+        // Vyhledání lezce podle kombinace jména a data narození
+        string lezecKey = $"{jmeno}-{datumNarozeni:dd.MM.yyyy}";
+        if (!lezci.ContainsKey(lezecKey))
+        {
+            Console.WriteLine($"Lezec s jménem {jmeno} a datem narození {datumNarozeni:dd.MM.yyyy} neexistuje, nejprve ho musíš vložit do seznamu lezců.");
+            return;
+        }
+
+        LezeckaTrasa trasa = trasy[nazev];
+        Lezec lezec = lezci[lezecKey];
+
+        if (lezec is Dite dite && !dite.Souhlas)
+        {
+            Console.WriteLine($"Dítě {jmeno} nemá souhlas zákonného zástupce k lezení.");
+            return;
+        }
+
+        DateTime datumPokusu = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
+        datumPokusu = datumPokusu.Add(DateTime.Now.TimeOfDay); // Přidání aktuálního času pro jedinečný klíč
+
+        bool uspech = ZiskejBool("Byl pokus úspěšný? (y/n): ");
+
+        LezeckyPokus novyPokus = new LezeckyPokus(nazev, autor, jmeno, datumPokusu, uspech);
+        pokusy.Add(novyPokus);
+        Console.WriteLine("Lezecký pokus úspěšně přidán.");
+    }
+
+    /* public static void SmazatPokus(Dictionary<string,LezeckyPokus> pokusy)
     {
         var (nazev, autor, jmeno, datumPokusu, uspech) = ZadejZakladniAtributyPokusu();
-        string key = $"{nazev}-{jmeno}-{datumPokusu:dd.MM.yyyy}";
-
-        if (pokusy.Remove(key))
+        string key = $"{nazev}-{jmeno}-{datumPokusu:dd.MM.yyyy}-{uspech}";
+        var pokusyLezce = pokusy.Values.Where(p => p.Jmeno == jmeno && p.DatumPokusu == datumPokusu && p.Uspech == uspech && p.Nazev == nazev).OrderBy(p => p.Nazev).ToList();
+        
+        if (pokusyLezce.Any())
         {
-            Console.WriteLine("Pokus úspěšně smazán.");
+            Console.WriteLine($"Nalezené pokusy lezce:");
+            for (int i = 0; i < pokusyLezce.Count; i++)
+            {
+                var pokus = pokusyLezce[i];
+                Console.WriteLine($"{i+1}. pokus: Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Úspěch: {pokus.Uspech}");
+
+            }
+            Console.WriteLine($"Zadej číslo pokusu, který chceš smazat: ");
+            if (int.TryParse(Console.ReadLine().Trim(), out int index) && index > 0 && index <= pokusyLezce.Count)
+            {
+                var pokusKeSmazani = pokusyLezce[index - 1];
+                string keyPokusuKeSmazani = pokusy.First(kv => kv.Value == pokusKeSmazani).Key;
+
+                if (pokusy.Remove(keyPokusuKeSmazani))
+                {
+                    Console.WriteLine("Pokus byl úspěšně smazán.");
+                }
+                else
+                {
+                    Console.WriteLine("Nepodařilo se smazat pokus.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Neplatný výběr.");
+
+            }
+        }
+
+        else
+        {
+            Console.WriteLine("Pokus nenalezen.");
+        }
+    } */
+
+    public static void SmazatPokus(List<LezeckyPokus> pokusy)
+    {
+        var (nazev, autor, jmeno, datumPokusu, uspech) = ZadejZakladniAtributyPokusu();
+        var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno && p.DatumPokusu.Date == datumPokusu.Date && p.Uspech == uspech && p.Nazev == nazev).ToList();
+
+        if (pokusyLezce.Any())
+        {
+            Console.WriteLine($"Nalezené pokusy lezce:");
+            for (int i = 0; i < pokusyLezce.Count; i++)
+            {
+                var pokus = pokusyLezce[i];
+                Console.WriteLine($"{i + 1}: Trasa: {pokus.Nazev}, Lezec: {pokus.Jmeno}, Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Úspěch: {pokus.Uspech}");
+            }
+
+            Console.Write("Zadejte číslo pokusu, který chcete smazat: ");
+            if (int.TryParse(Console.ReadLine().Trim(), out int index) && index > 0 && index <= pokusyLezce.Count)
+            {
+                var pokusKeSmazani = pokusyLezce[index - 1];
+                pokusy.Remove(pokusKeSmazani);
+                Console.WriteLine("Pokus byl úspěšně smazán.");
+            }
+            else
+            {
+                Console.WriteLine("Neplatný výběr.");
+            }
         }
         else
         {
@@ -683,17 +819,38 @@ public static double ZiskejVysku()
         }
     }
 
-    public static void VypisPokusyLezcePodleTrasy(Dictionary<string,LezeckyPokus> pokusy)
-    {
-        if (pokusy == null || !pokusy.Any())
-        {
-            Console.WriteLine("Seznam pokusů je prázdný.");
-            return;
-        }
+    /* public static void VypisPokusyLezcePodleTrasy(Dictionary<string,LezeckyPokus> pokusy)
+     {
+         if (pokusy == null || !pokusy.Any())
+         {
+             Console.WriteLine("Seznam pokusů je prázdný.");
+             return;
+         }
 
+         string jmeno = ZiskejCeleJmeno();
+
+         var pokusyLezce = pokusy.Values.Where(p => p.Jmeno == jmeno).OrderBy(p => p.Nazev).ToList();
+         if (pokusyLezce.Any())
+         {
+             Console.WriteLine($"Pokusy lezce {jmeno} seřazené podle trasy:");
+             foreach (var pokus in pokusyLezce)
+             {
+                 Console.WriteLine($"Trasa: {pokus.Nazev}, Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Úspěch: {pokus.Uspech}");
+             }
+         }
+         else
+         {
+             Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
+         }
+
+     }*/
+
+    public static void VypisPokusyLezcePodleTrasy(List<LezeckyPokus> pokusy)
+    {
         string jmeno = ZiskejCeleJmeno();
 
-        var pokusyLezce = pokusy.Values.Where(p => p.Jmeno == jmeno).OrderBy(p => p.Nazev).ToList();
+        var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).OrderBy(p => p.Nazev).ToList();
+
         if (pokusyLezce.Any())
         {
             Console.WriteLine($"Pokusy lezce {jmeno} seřazené podle trasy:");
@@ -706,10 +863,9 @@ public static double ZiskejVysku()
         {
             Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
         }
-
     }
 
-    public static void VypisPokusyLezcePodleData(Dictionary<string, LezeckyPokus> pokusy)
+    /* public static void VypisPokusyLezcePodleData(Dictionary<string, LezeckyPokus> pokusy)
     {
         if (pokusy == null || !pokusy.Any())
         {
@@ -733,9 +889,29 @@ public static double ZiskejVysku()
         {
             Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
         }
+    } */
+
+    public static void VypisPokusyLezcePodleData(List<LezeckyPokus> pokusy)
+    {
+        string jmeno = ZiskejCeleJmeno();
+
+        var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).OrderBy(p => p.DatumPokusu).ToList();
+
+        if (pokusyLezce.Any())
+        {
+            Console.WriteLine($"Pokusy lezce {jmeno} seřazené podle data:");
+            foreach (var pokus in pokusyLezce)
+            {
+                Console.WriteLine($"Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Trasa: {pokus.Nazev}, Úspěch: {pokus.Uspech}");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
+        }
     }
 
-    public static void PrumernaUspesnostLezce(Dictionary<string,LezeckyPokus> pokusy)
+    /*public static void PrumernaUspesnostLezce(Dictionary<string,LezeckyPokus> pokusy)
     {
         if (pokusy == null || !pokusy.Any())
         {
@@ -761,9 +937,27 @@ public static double ZiskejVysku()
         {
             Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
         }
+    } */
+
+    public static void PrumernaUspesnostLezce(List<LezeckyPokus> pokusy)
+    {
+        string jmeno = ZiskejCeleJmeno();
+
+        var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).ToList();
+
+        if (pokusyLezce.Any())
+        {
+            double prumernaUspech = pokusyLezce.Average(p => p.Uspech ? 1 : 0) * 100;
+            Console.WriteLine($"Průměrná úspěšnost lezce {jmeno} je {prumernaUspech}%.");
+        }
+        else
+        {
+            Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
+        }
     }
 
-    public static void NejlepsiUspechLezce(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy)
+
+    /* public static void NejlepsiUspechLezce(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy)
     {
         if (pokusy == null || !pokusy.Any())
         {
@@ -791,9 +985,35 @@ public static double ZiskejVysku()
         {
             Console.WriteLine($"Lezec {jmeno} nemá žádné úspěšné pokusy.");
         }
+    } */
+
+    public static void NejlepsiUspechLezce(List<LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy)
+    {
+        string jmeno = ZiskejCeleJmeno();
+
+        var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno && p.Uspech).ToList();
+
+        if (pokusyLezce.Any())
+        {
+            var nejtezsiPokus = pokusyLezce.OrderByDescending(p => (int)p.Nazev.Last()).First();
+            var nejtezsiTrasa = trasy.Values.FirstOrDefault(t => t.Nazev == nejtezsiPokus.Nazev);
+
+            if (nejtezsiTrasa != null)
+            {
+                Console.WriteLine($"Nejtěžší dosažená trasa lezce {jmeno} je {nejtezsiPokus.Nazev} s obtížností {nejtezsiTrasa.Obtiznost}.");
+            }
+            else
+            {
+                Console.WriteLine($"Nejtěžší trasa lezce {jmeno} v seznamu nenalezena.");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Lezec {jmeno} nemá žádné úspěšné pokusy.");
+        }
     }
 
-    public static void VypisPokusyNaTrasePodleLezce(Dictionary<string, LezeckyPokus> pokusy)
+    /* public static void VypisPokusyNaTrasePodleLezce(Dictionary<string, LezeckyPokus> pokusy)
     {
         if (pokusy == null || !pokusy.Any())
         {
@@ -817,9 +1037,30 @@ public static double ZiskejVysku()
         {
             Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
         }
+    } */
+
+    public static void VypisPokusyNaTrasePodleLezce(List<LezeckyPokus> pokusy)
+    {
+        Console.Write("Zadej název trasy: ");
+        string nazevTrasy = Console.ReadLine().Trim();
+
+        var pokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy).OrderBy(p => p.Jmeno).ToList();
+
+        if (pokusyNaTrase.Any())
+        {
+            Console.WriteLine($"Pokusy na trase {nazevTrasy} seřazené podle lezce:");
+            foreach (var pokus in pokusyNaTrase)
+            {
+                Console.WriteLine($"Lezec: {pokus.Jmeno}, Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Úspěch: {pokus.Uspech}");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
+        }
     }
 
-    public static void VypisPokusyNaTrasePodleData(Dictionary<string, LezeckyPokus> pokusy)
+    /* public static void VypisPokusyNaTrasePodleData(Dictionary<string, LezeckyPokus> pokusy)
     {
         if (pokusy == null || !pokusy.Any())
         {
@@ -843,9 +1084,30 @@ public static double ZiskejVysku()
         {
             Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
         }
+    } */
+
+    public static void VypisPokusyNaTrasePodleData(List<LezeckyPokus> pokusy)
+    {
+        Console.Write("Zadej název trasy: ");
+        string nazevTrasy = Console.ReadLine().Trim();
+
+        var pokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy).OrderBy(p => p.DatumPokusu).ToList();
+
+        if (pokusyNaTrase.Any())
+        {
+            Console.WriteLine($"Pokusy na trase {nazevTrasy} seřazené podle data:");
+            foreach (var pokus in pokusyNaTrase)
+            {
+                Console.WriteLine($"Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Lezec: {pokus.Jmeno}, Úspěch: {pokus.Uspech}");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
+        }
     }
 
-    public static void PrumernaUspesnostTrasy(Dictionary<string, LezeckyPokus> pokusy)
+    /* public static void PrumernaUspesnostTrasy(Dictionary<string, LezeckyPokus> pokusy)
     {
         if (pokusy == null || !pokusy.Any())
         {
@@ -869,7 +1131,26 @@ public static double ZiskejVysku()
         {
             Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
         }
+    } */
+
+    public static void PrumernaUspesnostTrasy(List<LezeckyPokus> pokusy)
+    {
+        Console.Write("Zadej název trasy: ");
+        string nazevTrasy = Console.ReadLine().Trim();
+
+        var pokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy).ToList();
+
+        if (pokusyNaTrase.Any())
+        {
+            double prumernaUspech = pokusyNaTrase.Average(p => p.Uspech ? 1 : 0) * 100;
+            Console.WriteLine($"Průměrná úspěšnost trasy {nazevTrasy} je {prumernaUspech}%.");
+        }
+        else
+        {
+            Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
+        }
     }
+
 
     public static void VypisTrasyPodleAutora(Dictionary<string, LezeckaTrasa> trasy)
     {
@@ -922,7 +1203,7 @@ public static double ZiskejVysku()
         }
     }
 
-    public static void VypisNejmensihoUspesnehoLezceNaTrase(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, Lezec> lezci, Dictionary<String, LezeckaTrasa> trasy)
+    /* public static void VypisNejmensihoUspesnehoLezceNaTrase(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, Lezec> lezci, Dictionary<String, LezeckaTrasa> trasy)
     {
         if (pokusy == null || !pokusy.Any())
         {
@@ -967,6 +1248,34 @@ public static double ZiskejVysku()
 
         }
 
+    } */
+    public static void VypisNejmensihoUspesnehoLezceNaTrase(List<LezeckyPokus> pokusy, Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy)
+    {
+        Console.Write("Zadej název trasy: ");
+        string nazevTrasy = Console.ReadLine().Trim();
+
+        var uspesnePokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy && p.Uspech).ToList();
+        if (!uspesnePokusyNaTrase.Any())
+        {
+            Console.WriteLine($"Na trase {nazevTrasy} nebyl zaznamenán žádný úspěšný pokus.");
+            return;
+        }
+
+        var uspesniLezciNaTrase = uspesnePokusyNaTrase
+            .Select(p => lezci.Values.FirstOrDefault(l => l.Jmeno.Equals(p.Jmeno, StringComparison.OrdinalIgnoreCase)))
+            .Where(l => l != null)
+            .OrderBy(l => l.Vyska)
+            .ToList();
+
+        if (uspesniLezciNaTrase.Any())
+        {
+            var nejmensiLezec = uspesniLezciNaTrase.First();
+            Console.WriteLine($"Nejmenší úspěšný lezec na trase {nazevTrasy} je {nejmensiLezec.Jmeno}, Výška: {nejmensiLezec.Vyska} cm.");
+        }
+        else
+        {
+            Console.WriteLine($"Na trase {nazevTrasy} nebyl nalezen žádný úspěšný lezec.");
+        }
     }
 
 }

@@ -22,12 +22,12 @@ namespace Lezecka_stena_evidence
             // Načtení lezců, tras a evidence lezeckých pokusů ze souboru do seznamů
             // List<Lezec> lezci = EvidencniSystem.NactiLezce(lezciFilePath);
             // List<LezeckaTrasa> trasy = EvidencniSystem.NactiTrasy(trasyFilePath);
-            // List<LezeckyPokus> pokusy = EvidencniSystem.NactiPokusy(pokusyFilePath);
+             List<LezeckyPokus> pokusy = EvidencniSystem.NactiPokusyDoSeznamu(pokusyFilePath);
 
             // Načtení lezců, tras a evidence lezeckých pokusů ze souboru do slovníků
             Dictionary<string, Lezec> lezci = EvidencniSystem.NactiLezceDoSlovniku(lezciFilePath);
             Dictionary<string, LezeckaTrasa> trasy = EvidencniSystem.NactiTrasyDoSlovniku(trasyFilePath);
-            Dictionary<string, LezeckyPokus> pokusy = EvidencniSystem.NactiPokusyDoSlovniku(pokusyFilePath);
+            // Dictionary<string, LezeckyPokus> pokusy = EvidencniSystem.NactiPokusyDoSlovniku(pokusyFilePath);
 
 
             Console.WriteLine("Vítej v evidenčním systému lezeckých tras a lezců");
@@ -61,8 +61,9 @@ namespace Lezecka_stena_evidence
                 }
             }
         }
+        static void EditaceSeznamu(Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy, List<LezeckyPokus> pokusy, string lezciFilePath, string trasyFilePath, string pokusyFilePath)
 
-        static void EditaceSeznamu(Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string,LezeckyPokus> pokusy, string lezciFilePath, string trasyFilePath, string pokusyFilePath)
+        //static void EditaceSeznamu(Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string,LezeckyPokus> pokusy, string lezciFilePath, string trasyFilePath, string pokusyFilePath)
         {
             bool editaceBezi = true;
             while (editaceBezi)
@@ -176,8 +177,9 @@ namespace Lezecka_stena_evidence
                 Console.WriteLine($"Chyba při editaci tras: {ex.Message}");
             }
         }
+        static void EditacePokusů(List<LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, Lezec> lezci, string volbaUkonu, string pokusyFilePath)
 
-        static void EditacePokusů(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, Lezec> lezci, string volbaUkonu, string pokusyFilePath)
+        // static void EditacePokusů(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, Lezec> lezci, string volbaUkonu, string pokusyFilePath)
         {
             try
             {
@@ -207,8 +209,9 @@ namespace Lezecka_stena_evidence
                 Console.WriteLine($"Chyba při editaci pokusů: {ex.Message}");
             }
         }
+        static void ZobrazeniStatistik(Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy, List<LezeckyPokus> pokusy)
 
-        static void ZobrazeniStatistik(Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, LezeckyPokus> pokusy)
+       // static void ZobrazeniStatistik(Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, LezeckyPokus> pokusy)
         {
             bool zobrazeniBezi = true;
             while (zobrazeniBezi)
