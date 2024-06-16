@@ -947,7 +947,8 @@ public static double ZiskejVysku()
 
         if (pokusyLezce.Any())
         {
-            double prumernaUspech = pokusyLezce.Average(p => p.Uspech ? 1 : 0) * 100;
+            double prumernaUspech = Math.Round(pokusyLezce.Average(p => p.Uspech ? 1 : 0) * 100, 2);
+            Console.WriteLine($"Lezec {jmeno} lezl celkem {pokusyLezce.Count} krát, z toho {pokusyLezce.Count(p => p.Uspech)} krát úspěšně.");
             Console.WriteLine($"Průměrná úspěšnost lezce {jmeno} je {prumernaUspech}%.");
         }
         else
@@ -1142,7 +1143,9 @@ public static double ZiskejVysku()
 
         if (pokusyNaTrase.Any())
         {
-            double prumernaUspech = pokusyNaTrase.Average(p => p.Uspech ? 1 : 0) * 100;
+            double prumernaUspech = Math.Round(pokusyNaTrase.Average(p => p.Uspech ? 1 : 0) * 100, 2);
+            Console.WriteLine($"Trasa {nazevTrasy} byla lezena celkem {pokusyNaTrase.Count} krát, z toho {pokusyNaTrase.Count(p => p.Uspech)} krát úspěšně.");
+
             Console.WriteLine($"Průměrná úspěšnost trasy {nazevTrasy} je {prumernaUspech}%.");
         }
         else
