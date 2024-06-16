@@ -37,7 +37,7 @@ namespace Lezecka_stena_evidence
             bool maBezetProgram = true;
             while (maBezetProgram)
             {
-                Console.WriteLine("Chceš pracovat se záznamy nebo zobrazit statistiku? (1 = záznamy, 2 = statistika, X = konec)");
+                Console.WriteLine("Chceš pracovat se záznamy nebo zobrazit statistiku? (1 = záznamy, 2 = statistika, X = konec programu)");
                 string volbaZakladni = Console.ReadLine();
 
                 if (volbaZakladni.ToUpper() == "X")
