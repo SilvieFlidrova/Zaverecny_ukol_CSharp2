@@ -69,6 +69,7 @@ namespace Lezecka_stena_evidence
                 Console.WriteLine($"1 - seznamem lezců");
                 Console.WriteLine($"2 - seznamem lezeckých tras");
                 Console.WriteLine($"3 - evidencí lezeckých pokusů");
+                Console.WriteLine($"Chceš se vrátit o krok zpět? Dej jen enter.");
                 string volbaSeznamu = Console.ReadLine();
                 string volbaUkonu;
                 try
@@ -87,6 +88,8 @@ namespace Lezecka_stena_evidence
                             volbaUkonu = EvidencniSystem.DejNaVyber();
                             EditacePokusů(pokusy, trasy, lezci, volbaUkonu, pokusyFilePath);
                             break;
+                        case "":
+                            return;
                         default:
                             Console.WriteLine("Neplatný výběr.");
                             break;
@@ -125,6 +128,9 @@ namespace Lezecka_stena_evidence
                     case "3":
                         EvidencniSystem.SmazatLezce(lezci);
                         break;
+                    case "":
+                        return;
+
                     default:
                         Console.WriteLine("Neplatný výběr.");
 
@@ -154,6 +160,9 @@ namespace Lezecka_stena_evidence
                     case "3":
                         EvidencniSystem.SmazatTrasu(trasy);
                         break;
+                    case "":
+                        return;
+
                     default:
                         Console.WriteLine("Neplatný výběr.");
                         break;
@@ -182,6 +191,9 @@ namespace Lezecka_stena_evidence
                         EvidencniSystem.SmazatPokus(pokusy);
                         Console.WriteLine("Úpravy byly úspěšně provedeny.");
                         break;
+                    case "":
+                        return;
+
                     default:
                         Console.WriteLine("Neplatný výběr.");
                         break;
@@ -215,6 +227,7 @@ namespace Lezecka_stena_evidence
                 Console.WriteLine($"13 - seznam tras podle autora");
                 Console.WriteLine($"14 - seznam tras podle obtížnosti");
                 Console.WriteLine($"15 - seznam tras podle názvu");
+                Console.WriteLine($"Chceš se vrátit o krok zpět? Dej jen enter.");
 
                 string volbaStatistiky = Console.ReadLine();
                 try
@@ -266,6 +279,9 @@ namespace Lezecka_stena_evidence
                         case "15":
                             EvidencniSystem.VypisTrasyPodleNazvu(trasy);
                             break;
+                        case "":
+                            return;
+
 
                         default:
                             Console.WriteLine("Neplatný výběr.");

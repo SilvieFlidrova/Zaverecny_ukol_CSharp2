@@ -122,7 +122,7 @@ public class EvidencniSystem
 
     public static string DejNaVyber()
     {
-        Console.WriteLine($"Můžeš záznam přidat(1), záznam editovat(2) nebo záznam smazat(3):");
+        Console.WriteLine($"Můžeš záznam přidat(1), záznam editovat(2) nebo záznam smazat(3). Pokud se chceš vrátit o krok zpět, dej jen enter.");
         string volbaUkonu = Console.ReadLine();
         return volbaUkonu;
     }
@@ -215,7 +215,7 @@ public class EvidencniSystem
 
    
     /*metody pro praci s daty*/
-    /* práce s lezcem*/
+    /*práce s lezcem*/
 
     public static Dictionary<string, Lezec> NactiLezceDoSlovniku(string lezciFilePath)
     {
