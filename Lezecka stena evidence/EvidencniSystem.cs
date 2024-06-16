@@ -1189,8 +1189,8 @@ public class EvidencniSystem
             return;
         }
 
-        Console.Write("Zadej jméno lezce: ");
-        string jmeno = NormalizeText(Console.ReadLine());
+        
+        string jmeno = ZiskejCeleJmeno();
 
 
         var pokusyLezce = pokusy.Values.Where(p => p.Jmeno.Equals(jmeno, StringComparison.OrdinalIgnoreCase)).ToList();
