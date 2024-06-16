@@ -909,6 +909,12 @@ public class EvidencniSystem
 
     public static void VypisNejmensihoUspesnehoLezceNaTrase(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, Lezec> lezci, Dictionary<String, LezeckaTrasa> trasy)
     {
+        if (pokusy == null || !pokusy.Any())
+        {
+            Console.WriteLine("Seznam pokusů je prázdný.");
+            return;
+        }
+
         Console.WriteLine("Zadej názec trasy: ");
         string nazevTrasy = NormalizeText(Console.ReadLine());
 
