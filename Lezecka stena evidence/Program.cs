@@ -31,8 +31,7 @@ namespace Lezecka_stena_evidence
 
 
             Console.WriteLine("Vítej v evidenčním systému lezeckých tras a lezců");
-            Console.WriteLine("Můžeš editovat seznamy nebo požádat o výpis statistiky.");
-            Console.WriteLine("Pokud budeš chtít činnost ukončit, zadej X.");
+            Console.WriteLine("Můžeš editovat seznamy nebo požádat o výpis statistik.");
 
             bool maBezetProgram = true;
             while (maBezetProgram)
