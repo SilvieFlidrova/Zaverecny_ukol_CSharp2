@@ -37,11 +37,14 @@ namespace Lezecka_stena_evidence
             bool maBezetProgram = true;
             while (maBezetProgram)
             {
-                Console.WriteLine("Chceš upravovat seznamy nebo zobrazit statistiku? (1 = seznamy, 2 = statistika, X = konec)");
+                Console.WriteLine("Chceš pracovat se záznamy nebo zobrazit statistiku? (1 = záznamy, 2 = statistika, X = konec)");
                 string volbaZakladni = Console.ReadLine();
 
                 if (volbaZakladni.ToUpper() == "X")
                 {
+                    Console.WriteLine("Program končí. Vytvořené seznamy najdeš ve složce tohoto programu.");
+                    Console.WriteLine("Hezký den a zase někdy příště...");
+
                     maBezetProgram = false;
                 }
                 else if (volbaZakladni == "1")
@@ -65,10 +68,10 @@ namespace Lezecka_stena_evidence
             bool editaceBezi = true;
             while (editaceBezi)
             {
-                Console.WriteLine($"V rámci práce se záznamy můžeš pracovat se:");
-                Console.WriteLine($"1 - seznamem lezců");
-                Console.WriteLine($"2 - seznamem lezeckých tras");
-                Console.WriteLine($"3 - evidencí lezeckých pokusů");
+                Console.WriteLine($"V rámci práce se záznamy můžeš pracovat s:");
+                Console.WriteLine($"1 - lezci");
+                Console.WriteLine($"2 - lezeckými trasami");
+                Console.WriteLine($"3 - lezeckými pokusy");
                 Console.WriteLine($"Chceš se vrátit o krok zpět? Dej jen enter.");
                 string volbaSeznamu = Console.ReadLine();
                 string volbaUkonu;
@@ -97,12 +100,12 @@ namespace Lezecka_stena_evidence
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Chyba při práci se seznamy: {ex.Message}");
+                    Console.WriteLine($"Chyba při práci se záznamy: {ex.Message}");
                 }
 
                 if (editaceBezi)
                 {
-                    Console.WriteLine("Chceš pokračovat v práci se seznamy? (y/n)");
+                    Console.WriteLine("Chceš pokračovat v práci se záznamy? (y/n)");
                     if (Console.ReadLine().ToLower() != "y")
                     {
                         editaceBezi = false;
@@ -216,12 +219,12 @@ namespace Lezecka_stena_evidence
                 Console.WriteLine($"2 - seznam lezeckých tras");
                 Console.WriteLine($"3 - počet evidovaných tras");
                 Console.WriteLine($"4 - počet evidovaných lezců");
-                Console.WriteLine($"5 - záznamy lezení lezce podle tras");
-                Console.WriteLine($"6 - záznamy lezení lezce podle data");
+                Console.WriteLine($"5 - záznamy pokusů lezce podle tras");
+                Console.WriteLine($"6 - záznamy pokusů lezce podle data");
                 Console.WriteLine($"7 - průměrná úspěšnost lezce");
                 Console.WriteLine($"8 - nejtěžší trasa lezce");
-                Console.WriteLine($"9 - záznamy lezení na trase podle lezců");
-                Console.WriteLine($"10 - záznamy lezení na trase podle data");
+                Console.WriteLine($"9 - záznamy pokusů na trase podle lezců");
+                Console.WriteLine($"10 - záznamy pokusů na trase podle data");
                 Console.WriteLine($"11 - průměrná úspěšnost trasy");
                 Console.WriteLine($"12 - nejmenší úspěšný lezec na trase");
                 Console.WriteLine($"13 - seznam tras podle autora");
