@@ -46,10 +46,8 @@ namespace Lezecka_stena_evidence
                 Console.WriteLine($"{trasa.Nazev}, Autor: {trasa.Autor}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
             }
         }
-        public static void VypisPokusyLezcePodleTrasy(List<LezeckyPokus> pokusy)
+        public static void VypisPokusyLezcePodleTrasy(string jmeno, List<LezeckyPokus> pokusy)
         {
-            string jmeno = EvidencniSystem.ZiskejCeleJmeno();
-
             var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).OrderBy(p => p.Nazev).ToList();
 
             if (pokusyLezce.Any())
@@ -67,9 +65,8 @@ namespace Lezecka_stena_evidence
         }
 
 
-        public static void VypisPokusyLezcePodleData(List<LezeckyPokus> pokusy)
+        public static void VypisPokusyLezcePodleData(string jmeno, List<LezeckyPokus> pokusy)
         {
-            string jmeno = EvidencniSystem.ZiskejCeleJmeno();
 
             var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).OrderBy(p => p.DatumPokusu).ToList();
 
@@ -88,10 +85,8 @@ namespace Lezecka_stena_evidence
         }
 
 
-        public static void PrumernaUspesnostLezce(List<LezeckyPokus> pokusy)
+        public static void PrumernaUspesnostLezce(string jmeno, List<LezeckyPokus> pokusy)
         {
-            string jmeno = EvidencniSystem.ZiskejCeleJmeno();
-
             var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).ToList();
 
             if (pokusyLezce.Any())
@@ -108,9 +103,8 @@ namespace Lezecka_stena_evidence
 
 
 
-        public static void NejlepsiUspechLezce(List<LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy)
+        public static void NejlepsiUspechLezce(string jmeno, List<LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy)
         {
-            string jmeno = EvidencniSystem.ZiskejCeleJmeno();
 
             var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno && p.Uspech).ToList();
 
@@ -135,11 +129,8 @@ namespace Lezecka_stena_evidence
         }
 
 
-        public static void VypisPokusyNaTrasePodleLezce(List<LezeckyPokus> pokusy)
+        public static void VypisPokusyNaTrasePodleLezce(string nazevTrasy, List<LezeckyPokus> pokusy)
         {
-            Console.Write("Zadej název trasy: ");
-            string nazevTrasy = Console.ReadLine().Trim();
-
             var pokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy).OrderBy(p => p.Jmeno).ToList();
 
             if (pokusyNaTrase.Any())
@@ -157,10 +148,8 @@ namespace Lezecka_stena_evidence
         }
 
 
-        public static void VypisPokusyNaTrasePodleData(List<LezeckyPokus> pokusy)
+        public static void VypisPokusyNaTrasePodleData(string nazevTrasy, List<LezeckyPokus> pokusy)
         {
-            Console.Write("Zadej název trasy: ");
-            string nazevTrasy = Console.ReadLine().Trim();
 
             var pokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy).OrderBy(p => p.DatumPokusu).ToList();
 
@@ -179,11 +168,8 @@ namespace Lezecka_stena_evidence
         }
 
 
-        public static void PrumernaUspesnostTrasy(List<LezeckyPokus> pokusy)
+        public static void PrumernaUspesnostTrasy(string nazevTrasy, List<LezeckyPokus> pokusy)
         {
-            Console.Write("Zadej název trasy: ");
-            string nazevTrasy = Console.ReadLine().Trim();
-
             var pokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy).ToList();
 
             if (pokusyNaTrase.Any())

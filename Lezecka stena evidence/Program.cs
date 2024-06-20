@@ -252,25 +252,28 @@ namespace Lezecka_stena_evidence
                             Console.WriteLine($"Počet všech evidovaných lezců: {lezci.Count}");
                             break;
                         case "5":
-                            Vypisy.VypisPokusyLezcePodleTrasy(pokusy);
+                            Vypisy.VypisPokusyLezcePodleTrasy(EvidencniSystem.ZiskejCeleJmeno(), pokusy);
                             break;
                         case "6":
-                            Vypisy.VypisPokusyLezcePodleData(pokusy);
+                            Vypisy.VypisPokusyLezcePodleData(EvidencniSystem.ZiskejCeleJmeno(),pokusy);
                             break;
                         case "7":
-                            Vypisy.PrumernaUspesnostLezce(pokusy);
+                            Vypisy.PrumernaUspesnostLezce(EvidencniSystem.ZiskejCeleJmeno(), pokusy);
                             break;
                         case "8":
-                            Vypisy.NejlepsiUspechLezce(pokusy, trasy);
+                            Vypisy.NejlepsiUspechLezce(EvidencniSystem.ZiskejCeleJmeno(), pokusy, trasy);
                             break;
                         case "9":
-                            Vypisy.VypisPokusyNaTrasePodleLezce(pokusy);
+                            Console.Write("Zadej název trasy: ");
+                            Vypisy.VypisPokusyNaTrasePodleLezce(Console.ReadLine().Trim(),pokusy);
                             break;
                         case "10":
-                            Vypisy.VypisPokusyNaTrasePodleData(pokusy);
+                            Console.Write("Zadej název trasy: ");
+                            Vypisy.VypisPokusyNaTrasePodleData(Console.ReadLine().Trim(), pokusy);
                             break;
                         case "11":
-                            Vypisy.PrumernaUspesnostTrasy(pokusy);
+                            Console.Write("Zadej název trasy: ");
+                            Vypisy.PrumernaUspesnostTrasy(Console.ReadLine().Trim(), pokusy);
                             break;
                         case "12":
                             Console.Write("Zadej název trasy: ");
