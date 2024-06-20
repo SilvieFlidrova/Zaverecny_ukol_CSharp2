@@ -4,20 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lezecka_stena_evidence.NewFolder
+namespace Lezecka_stena_evidence.NewFolder;
+
+// Potomek třída pro děti
+public class Dite : Lezec
 {
-    // Potomek třída pro děti
-    public class Dite : Lezec
+    public string JmenoZakonnehoZastupce { get; set; }
+    public bool Souhlas { get; set; }
+    public Dite(string jmeno, DateTime datumNarozeni, double vyska, string jmenoZZ, bool souhlas)
+     : base(jmeno, datumNarozeni, vyska)
     {
-        public string JmenoZakonnehoZastupce { get; set; }
-        public bool Souhlas { get; set; }
-
-        public Dite(string jmeno, DateTime datumNarozeni, double vyska, string jmenoZZ, bool souhlas)
-         : base(jmeno, datumNarozeni, vyska)
-        {
-            JmenoZakonnehoZastupce = jmenoZZ;
-            Souhlas = souhlas;
-        }
-
+        JmenoZakonnehoZastupce = jmenoZZ;
+        Souhlas = souhlas;
     }
 }
