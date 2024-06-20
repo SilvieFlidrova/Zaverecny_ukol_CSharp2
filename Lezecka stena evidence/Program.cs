@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Lezecka_stena_evidence.Data;
+using Lezecka_stena_evidence.NewFolder;
 
 namespace Lezecka_stena_evidence
 {
@@ -22,11 +24,11 @@ namespace Lezecka_stena_evidence
             // Načtení lezců, tras a evidence lezeckých pokusů ze souboru do seznamů
             // List<Lezec> lezci = EvidencniSystem.NactiLezce(lezciFilePath);
             // List<LezeckaTrasa> trasy = EvidencniSystem.NactiTrasy(trasyFilePath);
-             List<LezeckyPokus> pokusy = EvidencniSystem.NactiPokusyDoSeznamu(pokusyFilePath);
+             List<LezeckyPokus> pokusy = PraceSeSoubory.NactiPokusyDoSeznamu(pokusyFilePath);
 
             // Načtení lezců, tras a evidence lezeckých pokusů ze souboru do slovníků
-            Dictionary<string, Lezec> lezci = EvidencniSystem.NactiLezceDoSlovniku(lezciFilePath);
-            Dictionary<string, LezeckaTrasa> trasy = EvidencniSystem.NactiTrasyDoSlovniku(trasyFilePath);
+            Dictionary<string, Lezec> lezci = PraceSeSoubory.NactiLezceDoSlovniku(lezciFilePath);
+            Dictionary<string, LezeckaTrasa> trasy = PraceSeSoubory.NactiTrasyDoSlovniku(trasyFilePath);
             // Dictionary<string, LezeckyPokus> pokusy = EvidencniSystem.NactiPokusyDoSlovniku(pokusyFilePath);
 
 
@@ -39,25 +41,23 @@ namespace Lezecka_stena_evidence
                 Console.WriteLine("Chceš pracovat se záznamy nebo zobrazit statistiku? (1 = záznamy, 2 = statistika, X = konec programu)");
                 string volbaZakladni = Console.ReadLine();
 
-                if (volbaZakladni.ToUpper() == "X")
+                switch(volbaZakladni.ToUpper())
                 {
-                    Console.WriteLine("Program končí. Vytvořené seznamy najdeš ve složce tohoto programu.");
-                    Console.WriteLine("Hezký den a zase někdy příště...");
+                    case "X":
+                        Console.WriteLine("Program končí. Vytvořené seznamy najdeš ve složce tohoto programu.");
+                        Console.WriteLine("Hezký den a zase někdy příště...");
 
-                    maBezetProgram = false;
-                }
-                else if (volbaZakladni == "1")
-                {
-                    EditaceSeznamu(lezci, trasy, pokusy, lezciFilePath, trasyFilePath, pokusyFilePath);
-                }
-
-                else if (volbaZakladni == "2")
-                {
-                    ZobrazeniStatistik(lezci, trasy, pokusy);
-                }
-                else
-                {
-                    Console.WriteLine("Neplatný výběr.");
+                        maBezetProgram = false;
+                        break;
+                    case "1":
+                        EditaceSeznamu(lezci, trasy, pokusy, lezciFilePath, trasyFilePath, pokusyFilePath);
+                        break;
+                    case "2":
+                        ZobrazeniStatistik(lezci, trasy, pokusy);
+                        break;
+                    default:
+                        Console.WriteLine("Neplatný výběr.");
+                        break;
                 }
             }
         }
@@ -139,7 +139,7 @@ namespace Lezecka_stena_evidence
 
                         break;
                 }
-                EvidencniSystem.UlozLezce(lezciFilePath, lezci);
+                PraceSeSoubory.UlozLezce(lezciFilePath, lezci);
                
             }
             catch (Exception ex)
@@ -170,7 +170,7 @@ namespace Lezecka_stena_evidence
                         Console.WriteLine("Neplatný výběr.");
                         break;
                 }
-                EvidencniSystem.UlozTrasy(trasyFilePath, trasy);
+                PraceSeSoubory.UlozTrasy(trasyFilePath, trasy);
             }
             catch (Exception ex)
             {
@@ -202,7 +202,7 @@ namespace Lezecka_stena_evidence
                         Console.WriteLine("Neplatný výběr.");
                         break;
                 }
-                EvidencniSystem.UlozPokusy(pokusyFilePath, pokusy);
+                PraceSeSoubory.UlozPokusy(pokusyFilePath, pokusy);
             }
             catch (Exception ex)
             {
@@ -240,10 +240,10 @@ namespace Lezecka_stena_evidence
                     switch (volbaStatistiky)
                     {
                         case "1":
-                            EvidencniSystem.VypisLezce(lezci);
+                            Vypisy.VypisLezce(lezci);
                             break;
                         case "2":
-                            EvidencniSystem.VypisTrasy(trasy);
+                            Vypisy.VypisTrasy(trasy);
                             break;
                         case "3":
                             Console.WriteLine($"Počet všech evidovaných tras: {trasy.Count}");
@@ -252,37 +252,38 @@ namespace Lezecka_stena_evidence
                             Console.WriteLine($"Počet všech evidovaných lezců: {lezci.Count}");
                             break;
                         case "5":
-                            EvidencniSystem.VypisPokusyLezcePodleTrasy(pokusy);
+                            Vypisy.VypisPokusyLezcePodleTrasy(pokusy);
                             break;
                         case "6":
-                            EvidencniSystem.VypisPokusyLezcePodleData(pokusy);
+                            Vypisy.VypisPokusyLezcePodleData(pokusy);
                             break;
                         case "7":
-                            EvidencniSystem.PrumernaUspesnostLezce(pokusy);
+                            Vypisy.PrumernaUspesnostLezce(pokusy);
                             break;
                         case "8":
-                            EvidencniSystem.NejlepsiUspechLezce(pokusy, trasy);
+                            Vypisy.NejlepsiUspechLezce(pokusy, trasy);
                             break;
                         case "9":
-                            EvidencniSystem.VypisPokusyNaTrasePodleLezce(pokusy);
+                            Vypisy.VypisPokusyNaTrasePodleLezce(pokusy);
                             break;
                         case "10":
-                            EvidencniSystem.VypisPokusyNaTrasePodleData(pokusy);
+                            Vypisy.VypisPokusyNaTrasePodleData(pokusy);
                             break;
                         case "11":
-                            EvidencniSystem.PrumernaUspesnostTrasy(pokusy);
+                            Vypisy.PrumernaUspesnostTrasy(pokusy);
                             break;
                         case "12":
-                            EvidencniSystem.VypisNejmensihoUspesnehoLezceNaTrase(pokusy, lezci, trasy);
+                            Console.Write("Zadej název trasy: ");
+                            Vypisy.VypisNejmensihoUspesnehoLezceNaTrase(Console.ReadLine().Trim(), pokusy, lezci, trasy);
                             break;
                         case "13":
-                            EvidencniSystem.VypisTrasyPodleAutora(trasy);
+                            Vypisy.VypisTrasyPodleAutora(trasy);
                             break;
                         case "14":
-                            EvidencniSystem.VypisTrasyPodleObtiznosti(trasy);
+                            Vypisy.VypisTrasyPodleObtiznosti(trasy);
                             break;
                         case "15":
-                            EvidencniSystem.VypisTrasyPodleNazvu(trasy);
+                            Vypisy.VypisTrasyPodleNazvu(trasy);
                             break;
                         case "":
                             return;

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lezecka_stena_evidence
+namespace Lezecka_stena_evidence.Data
 {
     public class LezeckyPokus
     {

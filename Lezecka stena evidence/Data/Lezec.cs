@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lezecka_stena_evidence
+namespace Lezecka_stena_evidence.NewFolder
 {
     // Třída pro lezce
     public class Lezec
@@ -14,11 +14,16 @@ namespace Lezecka_stena_evidence
         public DateTime DatumNarozeni { get; set; }
         public double Vyska { get; set; }
 
-        public Lezec(string jmeno, string datumNarozeni, double vyska)
+        public Lezec(string jmeno, DateTime datumNarozeni, double vyska)
         {
             Jmeno = jmeno;
-            DatumNarozeni = DateTime.ParseExact(datumNarozeni, "dd.MM.yyyy", CultureInfo.InvariantCulture);
+            DatumNarozeni = datumNarozeni;
             Vyska = vyska;
+        }
+        public double VratVek()
+        {
+            TimeSpan vekSpan = DateTime.Now - DatumNarozeni;
+            return vekSpan.TotalDays / 365.25;
         }
 
         // ko unikatnosti
@@ -36,6 +41,6 @@ namespace Lezecka_stena_evidence
             return HashCode.Combine(Jmeno, DatumNarozeni, Vyska);
         }
 
-       
+
     }
 }

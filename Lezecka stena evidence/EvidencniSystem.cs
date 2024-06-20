@@ -1,4 +1,6 @@
 ﻿using Lezecka_stena_evidence;
+using Lezecka_stena_evidence.Data;
+using Lezecka_stena_evidence.NewFolder;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,11 +13,6 @@ using System.Threading.Tasks;
 public class EvidencniSystem
 {
     //pomocne metody
-    public static double VypocitejVek(DateTime datumNarozeni)
-    {
-        TimeSpan vekSpan = DateTime.Now - datumNarozeni;
-        return vekSpan.TotalDays / 365.25;
-    }
 
     public static string ZiskejCeleJmeno()
     {
@@ -40,22 +37,9 @@ public class EvidencniSystem
         Console.Write(prompt);
         string vstup = Console.ReadLine();
 
-        return NormalizeText(vstup);
+        return PomocnaTrida.NormalizeText(vstup);
     }
 
-    public static string NormalizeText(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return default;
-        }
-        else
-        {
-            text = text.Trim();
-            return char.ToUpper(text[0]) + text.Substring(1).ToLower();
-        }
-
-    }
 
     public static (string nazev, string autor) ZiskejTrasu()
     {
@@ -63,7 +47,7 @@ public class EvidencniSystem
         do
         {
             Console.Write("Zadej název trasy: ");
-            nazev = NormalizeText(Console.ReadLine());
+            nazev = PomocnaTrida.NormalizeText(Console.ReadLine());
             if (string.IsNullOrWhiteSpace(nazev))
             {
                 Console.WriteLine("Název trasy je povinný, musiš ho zadat.");
@@ -76,7 +60,7 @@ public class EvidencniSystem
         do
         {
             Console.Write("Zadej autora trasy: ");
-            autor = NormalizeText(Console.ReadLine());
+            autor = PomocnaTrida.NormalizeText(Console.ReadLine());
             if (string.IsNullOrWhiteSpace(autor))
             {
                 Console.WriteLine("Autor trasy je povinný, musiš ho zadat. Pokud ho neznáš, zadej anonym");
@@ -86,7 +70,7 @@ public class EvidencniSystem
         return (nazev, autor);
     }
 
-public static double ZiskejVysku()
+    public static double ZiskejVysku()
     {
         Console.Write("Zadejte výšku lezce (v cm): ");
         double vyska;
@@ -208,10 +192,10 @@ public static double ZiskejVysku()
         DateTime datumPokusu = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
 
         Console.Write("Zadej název trasy: ");
-        string nazev = NormalizeText(Console.ReadLine());
+        string nazev = PomocnaTrida.NormalizeText(Console.ReadLine());
 
         Console.Write("Zadej jméno autora trasy: ");
-        string autor = NormalizeText(Console.ReadLine());
+        string autor = PomocnaTrida.NormalizeText(Console.ReadLine());
 
         bool uspech = ZiskejBool("Byl pokus úspěšný? (y/n): ");
 
@@ -223,95 +207,7 @@ public static double ZiskejVysku()
     }
 
    
-    /*metody pro praci s daty*/
     /*práce s lezcem*/
-
-    public static Dictionary<string, Lezec> NactiLezceDoSlovniku(string lezciFilePath)
-    {
-        Dictionary<string, Lezec> lezci = new Dictionary<string, Lezec>();
-        if (File.Exists(lezciFilePath))
-        {
-            try
-            {
-                foreach (var line in File.ReadAllLines(lezciFilePath))
-                {
-                    var parts = line.Split(';');
-                    DateTime datumNarozeni = DateTime.ParseExact(parts[1], "dd.MM.yyyy", CultureInfo.InvariantCulture);
-
-                    Lezec lezec;
-                    if ((DateTime.Now - datumNarozeni).TotalDays / 365.25 >= 18) // Lezec
-                    {
-                        lezec = new Lezec(parts[0], parts[1], double.Parse(parts[2]));
-                    }
-                    else // Dite
-                    {
-                        lezec = new Dite(parts[0], parts[1], double.Parse(parts[2]), parts[3], bool.Parse(parts[4]));
-                    }
-
-                    string key = $"{lezec.Jmeno}-{lezec.DatumNarozeni:dd.MM.yyyy}";
-
-                    if (!lezci.ContainsKey(key))
-                    {
-                        lezci.Add(key, lezec);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Chyba při načítání lezců: {ex.Message}");
-            }
-        }
-
-        return lezci;
-    }
-
-    public static void VypisLezce(Dictionary<string, Lezec> lezci)
-    {
-        if (lezci == null || !lezci.Any())
-        {
-            Console.WriteLine("Seznam lezců je prázdný.");
-            return;
-        }
-
-        var serazeniLezci = lezci.Values.OrderBy(l => l.Jmeno).ToList();
-
-        Console.WriteLine("Seznam lezců seřazený podle abecedy:");
-        foreach (var lezec in serazeniLezci)
-        {
-            Console.WriteLine($"{lezec.Jmeno}, Datum narození: {lezec.DatumNarozeni:dd.MM.yyyy}, Věk: {Math.Floor(EvidencniSystem.VypocitejVek(lezec.DatumNarozeni))} let, Výška: {lezec.Vyska} cm");
-            if (lezec is Dite dite)
-            {
-                Console.WriteLine($"  Jméno zákonného zástupce: {dite.JmenoZakonnehoZastupce}, Souhlas: {dite.Souhlas}");
-            }
-        }
-    }
-
-    public static void UlozLezce(string lezcifilePath, Dictionary<string, Lezec> lezci)
-    {
-        List<string> lines = new List<string>();
-
-        foreach (var lezec in lezci.Values)
-        {
-            if (lezec is Dite dite)
-            {
-                lines.Add($"{dite.Jmeno};{dite.DatumNarozeni:dd.MM.yyyy};{dite.Vyska};{dite.JmenoZakonnehoZastupce};{dite.Souhlas}");
-            }
-            else
-            {
-                lines.Add($"{lezec.Jmeno};{lezec.DatumNarozeni:dd.MM.yyyy};{lezec.Vyska}");
-            }
-        }
-
-        try
-        {
-            File.WriteAllLines(lezcifilePath, lines);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Chyba při ukládání lezců: {ex.Message}");
-        }
-    }
-
     public static void PridatLezceZKonzole(Dictionary<string, Lezec> lezci)
     {
         var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributyLezce();
@@ -324,16 +220,13 @@ public static double ZiskejVysku()
 
         Lezec novyLezec;
 
-        if (VypocitejVek(datumNarozeniDate) < 18)
+        novyLezec = new Lezec(jmeno, datumNarozeniDate, vyska);
+        if (novyLezec.VratVek() < 18)
         {
             var (jmenoZakonnehoZastupce, souhlas) = ZadejDoplnujiciAtributyLezce();
-            novyLezec = new Dite(jmeno, datumNarozeni, vyska, jmenoZakonnehoZastupce, souhlas);
+            novyLezec = new Dite(jmeno, datumNarozeniDate, vyska, jmenoZakonnehoZastupce, souhlas);
         }
-        else
-        {
-            novyLezec = new Lezec(jmeno, datumNarozeni, vyska);
-        }
-
+      
         string key = $"{novyLezec.Jmeno}-{novyLezec.DatumNarozeni:dd.MM.yyyy}";
 
         if (!lezci.ContainsKey(key))
@@ -420,71 +313,6 @@ public static double ZiskejVysku()
 
 
     /*prace s trasou*/
-
-    public static Dictionary<string, LezeckaTrasa> NactiTrasyDoSlovniku(string trasyFilePath)
-    {
-        Dictionary<string, LezeckaTrasa> trasy = new Dictionary<string, LezeckaTrasa>();
-        if (File.Exists(trasyFilePath))
-        {
-            try
-            {
-                foreach (var line in File.ReadAllLines(trasyFilePath))
-                {
-                    var parts = line.Split(';');
-
-                    LezeckaTrasa trasa = new LezeckaTrasa(parts[0], parts[1], (Obtiznost)Enum.Parse(typeof(Obtiznost), parts[2]), double.Parse(parts[3]));
-
-                    if (!trasy.ContainsKey(trasa.Nazev))
-                    {
-                        trasy.Add(trasa.Nazev, trasa);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Chyba při načítání tras: {ex.Message}");
-            }
-        }
-
-        return trasy;
-    }
-
-    public static void UlozTrasy(string filePath, Dictionary<string, LezeckaTrasa> trasy)
-    {
-        List<string> lines = new List<string>();
-
-        foreach (var trasa in trasy.Values)
-        {
-            lines.Add($"{trasa.Nazev};{trasa.Autor};{trasa.Obtiznost};{trasa.Delka}");
-        }
-
-        try
-        {
-            File.WriteAllLines(filePath, lines);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Chyba při ukládání tras: {ex.Message}");
-        }
-    }
-
-    public static void VypisTrasy(Dictionary<string, LezeckaTrasa> trasy)
-    {
-        if (trasy == null || !trasy.Any())
-        {
-            Console.WriteLine("Seznam tras je prázdný.");
-            return;
-        }
-
-        var serazeneTrasy = trasy.Values.OrderBy(t => t.Nazev).ToList();
-
-        Console.WriteLine("Seznam lezeckých tras seřazený podle názvu:");
-        foreach (var trasa in serazeneTrasy)
-        {
-            Console.WriteLine($"{trasa.Nazev}, Autor: {trasa.Autor}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
-        }
-    }
-
     public static void PridatTrasuZKonzole(Dictionary<string, LezeckaTrasa> trasy)
     {
         var (nazev, autor, obtiznost, delka) = ZadejZakladniAtributyTrasy();
@@ -505,7 +333,7 @@ public static double ZiskejVysku()
     public static void EditovatTrasu(Dictionary<string, LezeckaTrasa> trasy)
     {
         Console.Write("Zadej název trasy: ");
-        string nazev = NormalizeText(Console.ReadLine());
+        string nazev = PomocnaTrida.NormalizeText(Console.ReadLine());
 
         if (trasy.TryGetValue(nazev, out LezeckaTrasa trasaKEditaci))
         {
@@ -549,7 +377,7 @@ public static double ZiskejVysku()
     public static void SmazatTrasu(Dictionary<string, LezeckaTrasa> trasy)
     {
         Console.Write("Zadej název trasy: ");
-        string nazev = NormalizeText(Console.ReadLine());
+        string nazev = PomocnaTrida.NormalizeText(Console.ReadLine());
         string key = $"{nazev}";
 
         if (trasy.TryGetValue(key, out LezeckaTrasa trasaKeSmazani))
@@ -577,133 +405,6 @@ public static double ZiskejVysku()
     }
 
     /* prace s pokusy*/
-
-    /* public static Dictionary<string, LezeckyPokus> NactiPokusyDoSlovniku(string pokusyFilePath)
-    {
-        Dictionary<string, LezeckyPokus> pokusy = new Dictionary<string, LezeckyPokus>();
-        if (File.Exists(pokusyFilePath))
-        {
-            try
-            {
-                foreach (var line in File.ReadAllLines(pokusyFilePath))
-                {
-                    var parts = line.Split(';');
-
-                    LezeckyPokus pokus = new LezeckyPokus(parts[0], parts[1], parts[2], DateTime.ParseExact(parts[3], "dd.MM.yyyy", CultureInfo.InvariantCulture), bool.Parse(parts[4]));
-
-                    string key = $"{pokus.Nazev}-{pokus.Jmeno}-{pokus.DatumPokusu:dd.MM.yyyy}";
-                    if (!pokusy.ContainsKey(key))
-                    {
-                        pokusy.Add(key, pokus);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Chyba při načítání pokusů: {ex.Message}");
-            }
-        }
-
-        return pokusy;
-    } */
-
-    public static List<LezeckyPokus> NactiPokusyDoSeznamu(string filePath)
-    {
-        List<LezeckyPokus> pokusy = new List<LezeckyPokus>();
-
-        if (File.Exists(filePath))
-        {
-            try
-            {
-                foreach (var line in File.ReadAllLines(filePath))
-                {
-                    var parts = line.Split(';');
-                    pokusy.Add(new LezeckyPokus(parts[0], parts[1], parts[2], DateTime.ParseExact(parts[3], "dd.MM.yyyy HH:mm:ss", CultureInfo.InvariantCulture), bool.Parse(parts[4])));
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Chyba při načítání pokusů: {ex.Message}");
-            }
-        }
-
-        return pokusy;
-    }
-
-    /* public static void UlozPokusy(string filePath, Dictionary<string, LezeckyPokus> pokusy)
-    {
-        List<string> lines = new List<string>();
-
-        foreach (var pokus in pokusy.Values)
-        {
-            lines.Add($"{pokus.Nazev};{pokus.Autor};{pokus.Jmeno};{pokus.DatumPokusu:dd.MM.yyyy};{pokus.Uspech}");
-        }
-
-        try
-        {
-            File.WriteAllLines(filePath, lines);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Chyba při ukládání pokusů: {ex.Message}");
-        }
-    }*/
-
-    public static void UlozPokusy(string filePath, List<LezeckyPokus> pokusy)
-    {
-        List<string> lines = new List<string>();
-
-        foreach (var pokus in pokusy)
-        {
-            lines.Add($"{pokus.Nazev};{pokus.Autor};{pokus.Jmeno};{pokus.DatumPokusu:dd.MM.yyyy HH:mm:ss};{pokus.Uspech}");
-        }
-
-        File.WriteAllLines(filePath, lines);
-    }
-
-    /* public static void PridatPokusZKonzole(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, Lezec> lezci)
-    {
-        var (nazev, autor) = ZiskejTrasu();
-
-        if (!trasy.ContainsKey(nazev))
-        {
-            Console.WriteLine($"Trasa s názvem {nazev} neexistuje, nejprve ji musíš vložit do seznamu tras.");
-            return;
-        }
-
-        string jmeno = ZiskejCeleJmeno();
-        DateTime datumNarozeni = ZiskejDatum("Zadej datum narozeni lezce (dd.MM.yyyy): ");
-
-        // Vyhledání lezce podle kombinace jména a data narození
-        string lezecKey = lezci.Keys.FirstOrDefault(key => key.StartsWith(jmeno));
-        if (lezecKey == null)
-        {
-            Console.WriteLine($"Lezec s jménem {jmeno} neexistuje, nejprve ho musíš vložit do seznamu lezců.");
-            return;
-        }
-
-        LezeckaTrasa trasa = trasy[nazev];
-        Lezec lezec = lezci[lezecKey];
-
-        if (lezec is Dite dite && !dite.Souhlas)
-        {
-            Console.WriteLine($"Dítě {jmeno} nemá souhlas zákonného zástupce k lezení.");
-            return;
-        }
-
-        DateTime datumPokusu = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
-
-        bool uspech = ZiskejBool("Byl pokus úspěšný? (y/n): ");
-
-        // Generování unikátního klíče pro každý pokus pomocí časového otisku
-        string keyPokus = $"{nazev}-{jmeno}-{datumPokusu:dd.MM.yyyy-HH.mm.ss.fff}";
-
-        LezeckyPokus novyPokus = new LezeckyPokus(nazev, autor, jmeno, datumPokusu, uspech);
-        pokusy.Add(keyPokus, novyPokus);
-        Console.WriteLine("Lezecký pokus úspěšně přidán.");
-    }
-    */
-
     public static void PridatPokusZKonzole(List<LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, Lezec> lezci)
     {
         var (nazev, autor) = ZiskejTrasu();
@@ -744,48 +445,6 @@ public static double ZiskejVysku()
         Console.WriteLine("Lezecký pokus úspěšně přidán.");
     }
 
-    /* public static void SmazatPokus(Dictionary<string,LezeckyPokus> pokusy)
-    {
-        var (nazev, autor, jmeno, datumPokusu, uspech) = ZadejZakladniAtributyPokusu();
-        string key = $"{nazev}-{jmeno}-{datumPokusu:dd.MM.yyyy}-{uspech}";
-        var pokusyLezce = pokusy.Values.Where(p => p.Jmeno == jmeno && p.DatumPokusu == datumPokusu && p.Uspech == uspech && p.Nazev == nazev).OrderBy(p => p.Nazev).ToList();
-        
-        if (pokusyLezce.Any())
-        {
-            Console.WriteLine($"Nalezené pokusy lezce:");
-            for (int i = 0; i < pokusyLezce.Count; i++)
-            {
-                var pokus = pokusyLezce[i];
-                Console.WriteLine($"{i+1}. pokus: Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Úspěch: {pokus.Uspech}");
-
-            }
-            Console.WriteLine($"Zadej číslo pokusu, který chceš smazat: ");
-            if (int.TryParse(Console.ReadLine().Trim(), out int index) && index > 0 && index <= pokusyLezce.Count)
-            {
-                var pokusKeSmazani = pokusyLezce[index - 1];
-                string keyPokusuKeSmazani = pokusy.First(kv => kv.Value == pokusKeSmazani).Key;
-
-                if (pokusy.Remove(keyPokusuKeSmazani))
-                {
-                    Console.WriteLine("Pokus byl úspěšně smazán.");
-                }
-                else
-                {
-                    Console.WriteLine("Nepodařilo se smazat pokus.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Neplatný výběr.");
-
-            }
-        }
-
-        else
-        {
-            Console.WriteLine("Pokus nenalezen.");
-        }
-    } */
 
     public static void SmazatPokus(List<LezeckyPokus> pokusy)
     {
@@ -819,466 +478,6 @@ public static double ZiskejVysku()
         }
     }
 
-    /* public static void VypisPokusyLezcePodleTrasy(Dictionary<string,LezeckyPokus> pokusy)
-     {
-         if (pokusy == null || !pokusy.Any())
-         {
-             Console.WriteLine("Seznam pokusů je prázdný.");
-             return;
-         }
 
-         string jmeno = ZiskejCeleJmeno();
-
-         var pokusyLezce = pokusy.Values.Where(p => p.Jmeno == jmeno).OrderBy(p => p.Nazev).ToList();
-         if (pokusyLezce.Any())
-         {
-             Console.WriteLine($"Pokusy lezce {jmeno} seřazené podle trasy:");
-             foreach (var pokus in pokusyLezce)
-             {
-                 Console.WriteLine($"Trasa: {pokus.Nazev}, Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Úspěch: {pokus.Uspech}");
-             }
-         }
-         else
-         {
-             Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
-         }
-
-     }*/
-
-    public static void VypisPokusyLezcePodleTrasy(List<LezeckyPokus> pokusy)
-    {
-        string jmeno = ZiskejCeleJmeno();
-
-        var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).OrderBy(p => p.Nazev).ToList();
-
-        if (pokusyLezce.Any())
-        {
-            Console.WriteLine($"Pokusy lezce {jmeno} seřazené podle trasy:");
-            foreach (var pokus in pokusyLezce)
-            {
-                Console.WriteLine($"Trasa: {pokus.Nazev}, Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Úspěch: {pokus.Uspech}");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
-        }
-    }
-
-    /* public static void VypisPokusyLezcePodleData(Dictionary<string, LezeckyPokus> pokusy)
-    {
-        if (pokusy == null || !pokusy.Any())
-        {
-            Console.WriteLine("Seznam pokusů je prázdný.");
-            return;
-        }
-
-        string jmeno = ZiskejCeleJmeno();
-
-        var pokusyLezce = pokusy.Values.Where(p => p.Jmeno == jmeno).OrderBy(p => p.DatumPokusu).ToList();
-
-        if (pokusyLezce.Any())
-        {
-            Console.WriteLine($"Pokusy lezce {jmeno} seřazené podle data:");
-            foreach (var pokus in pokusyLezce)
-            {
-                Console.WriteLine($"Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Trasa: {pokus.Nazev}, Úspěch: {pokus.Uspech}");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
-        }
-    } */
-
-    public static void VypisPokusyLezcePodleData(List<LezeckyPokus> pokusy)
-    {
-        string jmeno = ZiskejCeleJmeno();
-
-        var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).OrderBy(p => p.DatumPokusu).ToList();
-
-        if (pokusyLezce.Any())
-        {
-            Console.WriteLine($"Pokusy lezce {jmeno} seřazené podle data:");
-            foreach (var pokus in pokusyLezce)
-            {
-                Console.WriteLine($"Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Trasa: {pokus.Nazev}, Úspěch: {pokus.Uspech}");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
-        }
-    }
-
-    /*public static void PrumernaUspesnostLezce(Dictionary<string,LezeckyPokus> pokusy)
-    {
-        if (pokusy == null || !pokusy.Any())
-        {
-            Console.WriteLine("Seznam pokusů je prázdný.");
-            return;
-        }
-
-        
-        string jmeno = ZiskejCeleJmeno();
-
-
-        var pokusyLezce = pokusy.Values.Where(p => p.Jmeno.Equals(jmeno, StringComparison.OrdinalIgnoreCase)).ToList();
-
-        if (pokusyLezce.Any())
-        {
-            int pocetPokusů = pokusyLezce.Count;
-            int pocetUspesnychPokusů = pokusyLezce.Count(p => p.Uspech);
-            double prumernaUspech = (double)pocetUspesnychPokusů / pocetPokusů * 100;
-            Console.WriteLine($"Lezec {jmeno} má {pocetPokusů} zaznamenaných pokusů, z toho {pocetUspesnychPokusů} úspěšných.");
-            Console.WriteLine($"Průměrná úspěšnost lezce {jmeno} je {prumernaUspech:F2}%.");
-        }
-        else
-        {
-            Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
-        }
-    } */
-
-    public static void PrumernaUspesnostLezce(List<LezeckyPokus> pokusy)
-    {
-        string jmeno = ZiskejCeleJmeno();
-
-        var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).ToList();
-
-        if (pokusyLezce.Any())
-        {
-            double prumernaUspech = Math.Round(pokusyLezce.Average(p => p.Uspech ? 1 : 0) * 100, 2);
-            Console.WriteLine($"Lezec {jmeno} lezl celkem {pokusyLezce.Count} krát, z toho {pokusyLezce.Count(p => p.Uspech)} krát úspěšně.");
-            Console.WriteLine($"Průměrná úspěšnost lezce {jmeno} je {prumernaUspech}%.");
-        }
-        else
-        {
-            Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
-        }
-    }
-
-
-    /* public static void NejlepsiUspechLezce(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy)
-    {
-        if (pokusy == null || !pokusy.Any())
-        {
-            Console.WriteLine("Seznam pokusů je prázdný.");
-            return;
-        }
-
-        string jmeno = ZiskejCeleJmeno();
-
-        var pokusyLezce = pokusy.Values.Where(p => p.Jmeno == jmeno && p.Uspech).ToList();
-
-        if (pokusyLezce.Any())
-        {
-            var nejtezsiPokus = pokusyLezce.OrderByDescending(p => (int)p.Nazev.Last()).First();
-            if (trasy.TryGetValue(nejtezsiPokus.Nazev, out LezeckaTrasa nejtezsiTrasa))
-            {
-                Console.WriteLine($"Nejtěžší dosažená trasa lezce {jmeno} je {nejtezsiPokus.Nazev} s obtížností {nejtezsiTrasa.Obtiznost}.");
-            }
-            else
-            {
-                Console.WriteLine($"Nejtěžší trasa lezce {jmeno} v seznamu nenalezena.");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"Lezec {jmeno} nemá žádné úspěšné pokusy.");
-        }
-    } */
-
-    public static void NejlepsiUspechLezce(List<LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy)
-    {
-        string jmeno = ZiskejCeleJmeno();
-
-        var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno && p.Uspech).ToList();
-
-        if (pokusyLezce.Any())
-        {
-            var nejtezsiPokus = pokusyLezce.OrderByDescending(p => (int)p.Nazev.Last()).First();
-            var nejtezsiTrasa = trasy.Values.FirstOrDefault(t => t.Nazev == nejtezsiPokus.Nazev);
-
-            if (nejtezsiTrasa != null)
-            {
-                Console.WriteLine($"Nejtěžší dosažená trasa lezce {jmeno} je {nejtezsiPokus.Nazev} s obtížností {nejtezsiTrasa.Obtiznost}.");
-            }
-            else
-            {
-                Console.WriteLine($"Nejtěžší trasa lezce {jmeno} v seznamu nenalezena.");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"Lezec {jmeno} nemá žádné úspěšné pokusy.");
-        }
-    }
-
-    /* public static void VypisPokusyNaTrasePodleLezce(Dictionary<string, LezeckyPokus> pokusy)
-    {
-        if (pokusy == null || !pokusy.Any())
-        {
-            Console.WriteLine("Seznam pokusů je prázdný.");
-            return;
-        }
-
-        Console.Write("Zadej název trasy: ");
-        string nazevTrasy = NormalizeText(Console.ReadLine());
-        var pokusyNaTrase = pokusy.Values.Where(p => p.Nazev == nazevTrasy).OrderBy(p => p.Jmeno).ToList();
-
-        if (pokusyNaTrase.Any())
-        {
-            Console.WriteLine($"Pokusy na trase {nazevTrasy} seřazené podle lezce:");
-            foreach (var pokus in pokusyNaTrase)
-            {
-                Console.WriteLine($"Lezec: {pokus.Jmeno}, Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Úspěch: {pokus.Uspech}");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
-        }
-    } */
-
-    public static void VypisPokusyNaTrasePodleLezce(List<LezeckyPokus> pokusy)
-    {
-        Console.Write("Zadej název trasy: ");
-        string nazevTrasy = Console.ReadLine().Trim();
-
-        var pokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy).OrderBy(p => p.Jmeno).ToList();
-
-        if (pokusyNaTrase.Any())
-        {
-            Console.WriteLine($"Pokusy na trase {nazevTrasy} seřazené podle lezce:");
-            foreach (var pokus in pokusyNaTrase)
-            {
-                Console.WriteLine($"Lezec: {pokus.Jmeno}, Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Úspěch: {pokus.Uspech}");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
-        }
-    }
-
-    /* public static void VypisPokusyNaTrasePodleData(Dictionary<string, LezeckyPokus> pokusy)
-    {
-        if (pokusy == null || !pokusy.Any())
-        {
-            Console.WriteLine("Seznam pokusů je prázdný.");
-            return;
-        }
-
-        Console.Write("Zadej název trasy: ");
-        string nazevTrasy = NormalizeText(Console.ReadLine());
-        var pokusyNaTrase = pokusy.Values.Where(p => p.Nazev == nazevTrasy).OrderBy(p => p.DatumPokusu).ToList();
-
-        if (pokusyNaTrase.Any())
-        {
-            Console.WriteLine($"Pokusy na trase {nazevTrasy} seřazené podle data:");
-            foreach (var pokus in pokusyNaTrase)
-            {
-                Console.WriteLine($"Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Lezec: {pokus.Jmeno}, Úspěch: {pokus.Uspech}");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
-        }
-    } */
-
-    public static void VypisPokusyNaTrasePodleData(List<LezeckyPokus> pokusy)
-    {
-        Console.Write("Zadej název trasy: ");
-        string nazevTrasy = Console.ReadLine().Trim();
-
-        var pokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy).OrderBy(p => p.DatumPokusu).ToList();
-
-        if (pokusyNaTrase.Any())
-        {
-            Console.WriteLine($"Pokusy na trase {nazevTrasy} seřazené podle data:");
-            foreach (var pokus in pokusyNaTrase)
-            {
-                Console.WriteLine($"Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Lezec: {pokus.Jmeno}, Úspěch: {pokus.Uspech}");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
-        }
-    }
-
-    /* public static void PrumernaUspesnostTrasy(Dictionary<string, LezeckyPokus> pokusy)
-    {
-        if (pokusy == null || !pokusy.Any())
-        {
-            Console.WriteLine("Seznam pokusů je prázdný.");
-            return;
-        }
-
-        Console.Write("Zadej název trasy: ");
-        string nazevTrasy = NormalizeText(Console.ReadLine());
-
-        var pokusyNaTrase = pokusy.Values.Where(p => p.Nazev == nazevTrasy).ToList();
-        var pocetUspesnychPokusu = pokusyNaTrase.Count(p => p.Uspech);
-
-        if (pokusyNaTrase.Any())
-        {
-            Console.WriteLine($"Trasa byla lezena {pokusyNaTrase.Count} krát, z toho {pocetUspesnychPokusu} krát úspěšně.");
-            double prumernaUspech = pokusyNaTrase.Average(p => p.Uspech ? 1 : 0) * 100;
-            Console.WriteLine($"Průměrná úspěšnost trasy {nazevTrasy} je {prumernaUspech}%.");
-        }
-        else
-        {
-            Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
-        }
-    } */
-
-    public static void PrumernaUspesnostTrasy(List<LezeckyPokus> pokusy)
-    {
-        Console.Write("Zadej název trasy: ");
-        string nazevTrasy = Console.ReadLine().Trim();
-
-        var pokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy).ToList();
-
-        if (pokusyNaTrase.Any())
-        {
-            double prumernaUspech = Math.Round(pokusyNaTrase.Average(p => p.Uspech ? 1 : 0) * 100, 2);
-            Console.WriteLine($"Trasa {nazevTrasy} byla lezena celkem {pokusyNaTrase.Count} krát, z toho {pokusyNaTrase.Count(p => p.Uspech)} krát úspěšně.");
-
-            Console.WriteLine($"Průměrná úspěšnost trasy {nazevTrasy} je {prumernaUspech}%.");
-        }
-        else
-        {
-            Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
-        }
-    }
-
-
-    public static void VypisTrasyPodleAutora(Dictionary<string, LezeckaTrasa> trasy)
-    {
-        if (trasy == null || !trasy.Any())
-        {
-            Console.WriteLine("Seznam tras je prázdný.");
-            return;
-        }
-
-        var trasyPodleAutora = trasy.Values.OrderBy(t => NormalizeText(t.Autor)).ToList();
-
-        Console.WriteLine("Seznam tras seřazený podle autora:");
-        foreach (var trasa in trasyPodleAutora)
-        {
-            Console.WriteLine($"Autor: {trasa.Autor}, Název: {trasa.Nazev}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
-        }
-    }
-
-    public static void VypisTrasyPodleObtiznosti(Dictionary<string, LezeckaTrasa> trasy)
-    {
-        if (trasy == null || !trasy.Any())
-        {
-            Console.WriteLine("Seznam tras je prázdný.");
-            return;
-        }
-
-        var trasyPodleObtiznosti = trasy.Values.OrderBy(t => t.Obtiznost).ToList();
-
-        Console.WriteLine("Seznam tras seřazený podle obtížnosti:");
-        foreach (var trasa in trasyPodleObtiznosti)
-        {
-            Console.WriteLine($"Obtížnost: {trasa.Obtiznost}, Název: {trasa.Nazev}, Autor: {trasa.Autor}, Délka: {trasa.Delka} m");
-        }
-    }
-
-    public static void VypisTrasyPodleNazvu(Dictionary<string, LezeckaTrasa> trasy)
-    {
-        if (trasy == null || !trasy.Any())
-        {
-            Console.WriteLine("Seznam tras je prázdný.");
-            return;
-        }
-
-        var trasyPodleNazvu = trasy.Values.OrderBy(t => NormalizeText(t.Nazev)).ToList();
-
-        Console.WriteLine("Seznam tras seřazený podle názvu:");
-        foreach (var trasa in trasyPodleNazvu)
-        {
-            Console.WriteLine($"Název: {trasa.Nazev}, Autor: {trasa.Autor}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
-        }
-    }
-
-    /* public static void VypisNejmensihoUspesnehoLezceNaTrase(Dictionary<string, LezeckyPokus> pokusy, Dictionary<string, Lezec> lezci, Dictionary<String, LezeckaTrasa> trasy)
-    {
-        if (pokusy == null || !pokusy.Any())
-        {
-            Console.WriteLine("Seznam pokusů je prázdný.");
-            return;
-        }
-
-        Console.WriteLine("Zadej názec trasy: ");
-        string nazevTrasy = NormalizeText(Console.ReadLine());
-
-        if (!trasy.ContainsKey (nazevTrasy))
-        {
-            Console.WriteLine($"Trasa {nazevTrasy} v seznamu neexistuje.");
-            return;
-        }
-        
-        var uspesnePokusyNaTrase = pokusy.Values.Where(p => p.Nazev == nazevTrasy && p.Uspech).ToList();
-
-        if (!uspesnePokusyNaTrase.Any())
-        {
-            Console.WriteLine($"Na trase {nazevTrasy} nejsou evidovány žádné úspěšné pokusy.");
-            return;
-        }
-
-        var uspesniLezciNaTrase = uspesnePokusyNaTrase
-            .Select(p => lezci.Values.FirstOrDefault(l => l.Jmeno == p.Jmeno))
-            .Where(l => l != null)
-            .OrderBy(l => l.Vyska)
-            .ToList();
-
-
-        if (uspesniLezciNaTrase.Any())
-        {
-            var nejmensiLezec = uspesniLezciNaTrase.First();
-            Console.WriteLine($"Nejmenší lezec, který zdolal trasu {nazevTrasy} je {nejmensiLezec.Jmeno} s výškou {nejmensiLezec.Vyska} cm.");
-            return;
-        }
-                
-        else
-        {
-            Console.WriteLine($"Na trase {nazevTrasy} nejsou evidovány žádné úspěšné pokusy.");
-
-        }
-
-    } */
-    public static void VypisNejmensihoUspesnehoLezceNaTrase(List<LezeckyPokus> pokusy, Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy)
-    {
-        Console.Write("Zadej název trasy: ");
-        string nazevTrasy = Console.ReadLine().Trim();
-
-        var uspesnePokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy && p.Uspech).ToList();
-        if (!uspesnePokusyNaTrase.Any())
-        {
-            Console.WriteLine($"Na trase {nazevTrasy} nebyl zaznamenán žádný úspěšný pokus.");
-            return;
-        }
-
-        var uspesniLezciNaTrase = uspesnePokusyNaTrase
-            .Select(p => lezci.Values.FirstOrDefault(l => l.Jmeno.Equals(p.Jmeno, StringComparison.OrdinalIgnoreCase)))
-            .Where(l => l != null)
-            .OrderBy(l => l.Vyska)
-            .ToList();
-
-        if (uspesniLezciNaTrase.Any())
-        {
-            var nejmensiLezec = uspesniLezciNaTrase.First();
-            Console.WriteLine($"Nejmenší úspěšný lezec na trase {nazevTrasy} je {nejmensiLezec.Jmeno}, Výška: {nejmensiLezec.Vyska} cm.");
-        }
-        else
-        {
-            Console.WriteLine($"Na trase {nazevTrasy} nebyl nalezen žádný úspěšný lezec.");
-        }
-    }
 
 }
