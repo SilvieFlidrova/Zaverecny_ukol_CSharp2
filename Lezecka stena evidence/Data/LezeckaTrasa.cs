@@ -21,19 +21,5 @@ namespace Lezecka_stena_evidence.Data
             Delka = delka;
         }
 
-        // ko unikatnosti
-        public override bool Equals(object obj)
-        {
-            if (obj is LezeckaTrasa other)
-            {
-                return Nazev == other.Nazev && Autor == other.Autor && Obtiznost == other.Obtiznost;
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Nazev, Autor, Obtiznost, Delka);
-        }
     }
 }

@@ -26,21 +26,5 @@ namespace Lezecka_stena_evidence.NewFolder
             return vekSpan.TotalDays / 365.25;
         }
 
-        // ko unikatnosti
-        public override bool Equals(object obj)
-        {
-            if (obj is Lezec other)
-            {
-                return Jmeno == other.Jmeno && DatumNarozeni == other.DatumNarozeni && Vyska == other.Vyska;
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Jmeno, DatumNarozeni, Vyska);
-        }
-
-
     }
 }
