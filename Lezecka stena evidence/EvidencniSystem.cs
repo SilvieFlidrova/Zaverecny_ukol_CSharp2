@@ -118,6 +118,7 @@ public class EvidencniSystem
         string volbaUkonu = Console.ReadLine();
         return volbaUkonu;
     }
+    //
     //metody pro zadani atributu
     public static (string jmeno, string datumNarozeni, double vyska) ZadejZakladniAtributyLezce()
     {
@@ -151,7 +152,6 @@ public class EvidencniSystem
         }
         return (nazev, autor, obtiznost, delka);
     }
-
     public static (string nazev, string autor, string jmeno, DateTime datumPokusu, bool uspech) ZadejZakladniAtributyPokusu()
     {
         DateTime datumPokusu = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
@@ -164,7 +164,8 @@ public class EvidencniSystem
         datumPokusu = datumPokusu.Add(DateTime.Now.TimeOfDay);
         return (nazev, autor, jmeno, datumPokusu, uspech);
     }
-    //práce s lezcem
+    //
+    //metody pro práci s lezcem
     public static void PridatLezceZKonzole(Dictionary<string, Lezec> lezci)
     {
         var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributyLezce();
@@ -248,7 +249,8 @@ public class EvidencniSystem
             Console.WriteLine("Tento lezec v systemu neexistuje.");
         }
     }
-    /*prace s trasou*/
+    //
+    //metody pro práci s trasou
     public static void PridatTrasuZKonzole(Dictionary<string, LezeckaTrasa> trasy)
     {
         var (nazev, autor, obtiznost, delka) = ZadejZakladniAtributyTrasy();
@@ -326,7 +328,8 @@ public class EvidencniSystem
             Console.WriteLine("Tato trasa v systemu neexistuje.");
         }
     }
-    /* prace s pokusy*/
+    //
+    //metody pro práci s pokusem
     public static void PridatPokusZKonzole(List<LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, Lezec> lezci)
     {
         var (nazev, autor) = ZiskejTrasu();

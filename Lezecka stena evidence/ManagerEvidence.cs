@@ -12,16 +12,16 @@ namespace Lezecka_stena_evidence;
     {
     public void EditaceSeznamu(Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy, List<LezeckyPokus> pokusy, string lezciFilePath, string trasyFilePath, string pokusyFilePath)
     {
-        bool editaceBezi = true;
-        while (editaceBezi)
+        string volbaSeznamu;
+        string volbaUkonu;
+        do
         {
             Console.WriteLine($"V rámci práce se záznamy můžeš pracovat s:");
             Console.WriteLine($"1 - lezci");
             Console.WriteLine($"2 - lezeckými trasami");
             Console.WriteLine($"3 - lezeckými pokusy");
             Console.WriteLine($"Chceš se vrátit o krok zpět? Dej jen enter.");
-            string volbaSeznamu = Console.ReadLine();
-            string volbaUkonu;
+            volbaSeznamu = Console.ReadLine();
             switch (volbaSeznamu)
             {
                 case "1":
@@ -42,14 +42,8 @@ namespace Lezecka_stena_evidence;
                     Console.WriteLine("Neplatný výběr.");
                     break;
             }
-        }
-        //
-        if (editaceBezi)
-        {
             Console.WriteLine("Chceš pokračovat v práci se záznamy? (y/n)");
-            if (Console.ReadLine().ToLower() != "y")
-                editaceBezi = false;
-        }
+        } while (Console.ReadLine().ToLower() == "y");
     }
     static void EditaceLezcu(Dictionary<string, Lezec> lezci, string volbaUkonu, string lezciFilePath)
         {
