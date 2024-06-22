@@ -10,7 +10,6 @@ namespace Lezecka_stena_evidence;
 
     internal class ManagerEvidence
     {
-
         public void EditaceSeznamu(Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy, List<LezeckyPokus> pokusy, string lezciFilePath, string trasyFilePath, string pokusyFilePath)
         {
             bool editaceBezi = true;
