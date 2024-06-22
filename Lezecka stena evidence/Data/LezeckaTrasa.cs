@@ -8,8 +8,8 @@ namespace Lezecka_stena_evidence.Data;
 
 public class LezeckaTrasa
 {
-    public string Nazev { get; set; }
-    public string Autor { get; set; }
+    public string Nazev { get; }
+    public string Autor { get; }
     public Obtiznost Obtiznost { get; set; }
     public double Delka { get; set; }
     public LezeckaTrasa(string nazev, string autor, Obtiznost obtiznost, double delka)

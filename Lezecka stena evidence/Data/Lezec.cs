@@ -11,8 +11,8 @@ namespace Lezecka_stena_evidence.NewFolder;
 // Třída pro lezce
 public class Lezec
 {
-    public string Jmeno { get; set; }
-    public DateTime DatumNarozeni { get; set; }
+    public string Jmeno { get; }
+    public DateTime DatumNarozeni { get; }
     public double Vyska { get; set; }
     public Lezec(string jmeno, DateTime datumNarozeni, double vyska)
     {

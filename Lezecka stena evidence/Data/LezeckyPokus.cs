@@ -9,11 +9,11 @@ namespace Lezecka_stena_evidence.Data;
 
 public class LezeckyPokus
 {
-    public string Nazev { get; set; }
-    public string Autor { get; set; }
-    public string Jmeno { get; set; }
-    public DateTime DatumPokusu { get; set; }
-    public bool Uspech { get; set; }
+    public string Nazev { get; }
+    public string Autor { get; }
+    public string Jmeno { get; }
+    public DateTime DatumPokusu { get; }
+    public bool Uspech { get; }
     public LezeckyPokus(string nazev, string autor, string jmeno, DateTime datumPokusu, bool uspech)
     {
         Nazev = nazev;
