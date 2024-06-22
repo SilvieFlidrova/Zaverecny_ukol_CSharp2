@@ -31,7 +31,7 @@ class Program
         Console.WriteLine("Vítej v evidenčním systému lezeckých tras a lezců");
         Console.WriteLine("Můžeš editovat seznamy nebo požádat o výpis statistik.");
 
-        bool maBezetProgram = true;
+        bool maBezetProgram = true; //přepsat na do while
         while (maBezetProgram)
         {
             Console.WriteLine("Chceš pracovat se záznamy nebo zobrazit statistiku? (1 = záznamy, 2 = statistika, X = konec programu)");
@@ -279,8 +279,6 @@ class Program
                         break;
                     case "":
                         return;
-
-
                     default:
                         Console.WriteLine("Neplatný výběr.");
                         break;
