@@ -10,17 +10,18 @@ namespace Lezecka_stena_evidence;
 
     internal class ManagerEvidence
     {
-        public void EditaceSeznamu(Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy, List<LezeckyPokus> pokusy, string lezciFilePath, string trasyFilePath, string pokusyFilePath)
-        {
-        string volbaSeznamu = Console.ReadLine();
-        string volbaUkonu;
-        do
+    public void EditaceSeznamu(Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy, List<LezeckyPokus> pokusy, string lezciFilePath, string trasyFilePath, string pokusyFilePath)
+    {
+        bool editaceBezi = true;
+        while (editaceBezi)
         {
             Console.WriteLine($"V rámci práce se záznamy můžeš pracovat s:");
             Console.WriteLine($"1 - lezci");
             Console.WriteLine($"2 - lezeckými trasami");
             Console.WriteLine($"3 - lezeckými pokusy");
             Console.WriteLine($"Chceš se vrátit o krok zpět? Dej jen enter.");
+            string volbaSeznamu = Console.ReadLine();
+            string volbaUkonu;
             switch (volbaSeznamu)
             {
                 case "1":
@@ -41,10 +42,16 @@ namespace Lezecka_stena_evidence;
                     Console.WriteLine("Neplatný výběr.");
                     break;
             }
-            Console.WriteLine("Chceš pokračovat v práci se záznamy? (y/n)");
-        } while (Console.ReadLine().ToLower() != "y");
         }
-        static void EditaceLezcu(Dictionary<string, Lezec> lezci, string volbaUkonu, string lezciFilePath)
+        //
+        if (editaceBezi)
+        {
+            Console.WriteLine("Chceš pokračovat v práci se záznamy? (y/n)");
+            if (Console.ReadLine().ToLower() != "y")
+                editaceBezi = false;
+        }
+    }
+    static void EditaceLezcu(Dictionary<string, Lezec> lezci, string volbaUkonu, string lezciFilePath)
         {
             switch (volbaUkonu)
             {
