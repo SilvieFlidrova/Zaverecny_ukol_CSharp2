@@ -27,6 +27,7 @@ internal class Vypisy
                 Console.WriteLine($"  Jméno zákonného zástupce: {dite.JmenoZakonnehoZastupce}, Souhlas: {dite.Souhlas}");
             }
         }
+        Console.WriteLine();
     }
     public static void VypisTrasy(Dictionary<string, LezeckaTrasa> trasy)
     {
@@ -41,6 +42,7 @@ internal class Vypisy
         {
             Console.WriteLine($"{trasa.Nazev}, Autor: {trasa.Autor}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
         }
+        Console.WriteLine();
     }
     public static void VypisPokusyLezcePodleTrasy(string jmeno, List<LezeckyPokus> pokusy)
     {
@@ -57,6 +59,7 @@ internal class Vypisy
         {
             Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
         }
+        Console.WriteLine();
     }
     public static void VypisPokusyLezcePodleData(string jmeno, List<LezeckyPokus> pokusy)
     {
@@ -73,6 +76,7 @@ internal class Vypisy
         {
             Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
         }
+        Console.WriteLine();
     }
     public static void PrumernaUspesnostLezce(string jmeno, List<LezeckyPokus> pokusy)
     {
@@ -87,6 +91,7 @@ internal class Vypisy
         {
             Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
         }
+        Console.WriteLine();
     }
     public static void NejlepsiUspechLezce(string jmeno, List<LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy)
     {
@@ -109,13 +114,15 @@ internal class Vypisy
         {
             Console.WriteLine($"Lezec {jmeno} nemá žádné úspěšné pokusy.");
         }
+        Console.WriteLine();
     }
     public static void VypisPokusyNaTrasePodleLezce(string nazevTrasy, List<LezeckyPokus> pokusy)
     {
-        var pokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy).OrderBy(p => p.Jmeno).ToList();
+        string normovanyNazevTrasy = PomocnaTrida.NormalizeText(nazevTrasy);
+        var pokusyNaTrase = pokusy.Where(p => p.Nazev == normovanyNazevTrasy).OrderBy(p => p.Jmeno).ToList();
         if (pokusyNaTrase.Any())
         {
-            Console.WriteLine($"Pokusy na trase {nazevTrasy} seřazené podle lezce:");
+            Console.WriteLine($"Pokusy na trase {normovanyNazevTrasy} seřazené podle lezce:");
             foreach (var pokus in pokusyNaTrase)
             {
                 Console.WriteLine($"Lezec: {pokus.Jmeno}, Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Úspěch: {pokus.Uspech}");
@@ -123,15 +130,17 @@ internal class Vypisy
         }
         else
         {
-            Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
+            Console.WriteLine($"Trasa {normovanyNazevTrasy} nemá žádné zaznamenané pokusy.");
         }
+        Console.WriteLine();
     }
     public static void VypisPokusyNaTrasePodleData(string nazevTrasy, List<LezeckyPokus> pokusy)
     {
-        var pokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy).OrderBy(p => p.DatumPokusu).ToList();
+        string normovanyNazevTrasy = PomocnaTrida.NormalizeText(nazevTrasy);
+        var pokusyNaTrase = pokusy.Where(p => p.Nazev == normovanyNazevTrasy).OrderBy(p => p.DatumPokusu).ToList();
         if (pokusyNaTrase.Any())
         {
-            Console.WriteLine($"Pokusy na trase {nazevTrasy} seřazené podle data:");
+            Console.WriteLine($"Pokusy na trase {normovanyNazevTrasy} seřazené podle data:");
             foreach (var pokus in pokusyNaTrase)
             {
                 Console.WriteLine($"Datum: {pokus.DatumPokusu:dd.MM.yyyy}, Lezec: {pokus.Jmeno}, Úspěch: {pokus.Uspech}");
@@ -139,23 +148,26 @@ internal class Vypisy
         }
         else
         {
-            Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
+            Console.WriteLine($"Trasa {normovanyNazevTrasy} nemá žádné zaznamenané pokusy.");
         }
+        Console.WriteLine();
     }
     public static void PrumernaUspesnostTrasy(string nazevTrasy, List<LezeckyPokus> pokusy)
     {
-        var pokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy).ToList();
+        string normovanyNazevTrasy = PomocnaTrida.NormalizeText(nazevTrasy);
+        var pokusyNaTrase = pokusy.Where(p => p.Nazev == normovanyNazevTrasy).ToList();
         if (pokusyNaTrase.Any())
         {
             double prumernaUspech = Math.Round(pokusyNaTrase.Average(p => p.Uspech ? 1 : 0) * 100, 2);
-            Console.WriteLine($"Trasa {nazevTrasy} byla lezena celkem {pokusyNaTrase.Count} krát, z toho {pokusyNaTrase.Count(p => p.Uspech)} krát úspěšně.");
+            Console.WriteLine($"Trasa {normovanyNazevTrasy} byla lezena celkem {pokusyNaTrase.Count} krát, z toho {pokusyNaTrase.Count(p => p.Uspech)} krát úspěšně.");
 
-            Console.WriteLine($"Průměrná úspěšnost trasy {nazevTrasy} je {prumernaUspech}%.");
+            Console.WriteLine($"Průměrná úspěšnost trasy {normovanyNazevTrasy} je {prumernaUspech}%.");
         }
         else
         {
-            Console.WriteLine($"Trasa {nazevTrasy} nemá žádné zaznamenané pokusy.");
+            Console.WriteLine($"Trasa {normovanyNazevTrasy} nemá žádné zaznamenané pokusy.");
         }
+        Console.WriteLine();
     }
     public static void VypisTrasyPodleAutora(Dictionary<string, LezeckaTrasa> trasy)
     {
@@ -170,6 +182,7 @@ internal class Vypisy
         {
             Console.WriteLine($"Autor: {trasa.Autor}, Název: {trasa.Nazev}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
         }
+        Console.WriteLine();
     }
     public static void VypisTrasyPodleObtiznosti(Dictionary<string, LezeckaTrasa> trasy)
     {
@@ -184,6 +197,7 @@ internal class Vypisy
         {
             Console.WriteLine($"Obtížnost: {trasa.Obtiznost}, Název: {trasa.Nazev}, Autor: {trasa.Autor}, Délka: {trasa.Delka} m");
         }
+        Console.WriteLine();
     }
     public static void VypisTrasyPodleNazvu(Dictionary<string, LezeckaTrasa> trasy)
     {
@@ -198,13 +212,16 @@ internal class Vypisy
         {
             Console.WriteLine($"Název: {trasa.Nazev}, Autor: {trasa.Autor}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
         }
+        Console.WriteLine();
+
     }
     public static void VypisNejmensihoUspesnehoLezceNaTrase(string nazevTrasy, List<LezeckyPokus> pokusy, Dictionary<string, Lezec> lezci, Dictionary<string, LezeckaTrasa> trasy)
     {
-        var uspesnePokusyNaTrase = pokusy.Where(p => p.Nazev == nazevTrasy && p.Uspech).ToList();
+        string normovanyNazevTrasy = PomocnaTrida.NormalizeText(nazevTrasy);
+        var uspesnePokusyNaTrase = pokusy.Where(p => p.Nazev == normovanyNazevTrasy && p.Uspech).ToList();
         if (!uspesnePokusyNaTrase.Any())
         {
-            Console.WriteLine($"Na trase {nazevTrasy} nebyl zaznamenán žádný úspěšný pokus.");
+            Console.WriteLine($"Na trase {normovanyNazevTrasy} nebyl zaznamenán žádný úspěšný pokus.");
             return;
         }
         var uspesniLezciNaTrase = uspesnePokusyNaTrase
@@ -213,7 +230,8 @@ internal class Vypisy
             .OrderBy(l => l.Vyska)
             .ToList();
         var nejmensiLezec = uspesniLezciNaTrase.First();
-        Console.WriteLine($"Nejmenší úspěšný lezec na trase {nazevTrasy} je {nejmensiLezec.Jmeno}, Výška: {nejmensiLezec.Vyska} cm.");
+        Console.WriteLine($"Nejmenší úspěšný lezec na trase {normovanyNazevTrasy} je {nejmensiLezec.Jmeno}, Výška: {nejmensiLezec.Vyska} cm.");
+        Console.WriteLine();
         return;
     }
 }
