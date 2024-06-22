@@ -58,8 +58,6 @@ internal class Vypisy
             Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
         }
     }
-
-
     public static void VypisPokusyLezcePodleData(string jmeno, List<LezeckyPokus> pokusy)
     {
         var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).OrderBy(p => p.DatumPokusu).ToList();
@@ -76,7 +74,6 @@ internal class Vypisy
             Console.WriteLine($"Lezec {jmeno} nemá žádné zaznamenané pokusy.");
         }
     }
-
     public static void PrumernaUspesnostLezce(string jmeno, List<LezeckyPokus> pokusy)
     {
         var pokusyLezce = pokusy.Where(p => p.Jmeno == jmeno).ToList();
@@ -174,7 +171,6 @@ internal class Vypisy
             Console.WriteLine($"Autor: {trasa.Autor}, Název: {trasa.Nazev}, Obtížnost: {trasa.Obtiznost}, Délka: {trasa.Delka} m");
         }
     }
-
     public static void VypisTrasyPodleObtiznosti(Dictionary<string, LezeckaTrasa> trasy)
     {
         if (trasy == null || !trasy.Any())

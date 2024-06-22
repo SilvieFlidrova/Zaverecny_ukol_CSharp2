@@ -16,34 +16,27 @@ internal class PraceSeSoubory
         Dictionary<string, Lezec> lezci = new Dictionary<string, Lezec>();
         if (File.Exists(lezciFilePath))
         {
-            try
+            foreach (var line in File.ReadAllLines(lezciFilePath))
             {
-                foreach (var line in File.ReadAllLines(lezciFilePath))
+                var parts = line.Split(';');
+                DateTime datumNarozeni = DateTime.ParseExact(parts[1], "dd.MM.yyyy", CultureInfo.InvariantCulture);
+
+                Lezec lezec;
+                if ((DateTime.Now - datumNarozeni).TotalDays / 365.25 >= 18) // Lezec
                 {
-                    var parts = line.Split(';');
-                    DateTime datumNarozeni = DateTime.ParseExact(parts[1], "dd.MM.yyyy", CultureInfo.InvariantCulture);
-
-                    Lezec lezec;
-                    if ((DateTime.Now - datumNarozeni).TotalDays / 365.25 >= 18) // Lezec
-                    {
-                        lezec = new Lezec(parts[0], datumNarozeni, double.Parse(parts[2]));
-                    }
-                    else // Dite
-                    {
-                        lezec = new Dite(parts[0], datumNarozeni, double.Parse(parts[2]), parts[3], bool.Parse(parts[4]));
-                    }
-
-                    string key = $"{lezec.Jmeno}-{lezec.DatumNarozeni:dd.MM.yyyy}";
-
-                    if (!lezci.ContainsKey(key))
-                    {
-                        lezci.Add(key, lezec);
-                    }
+                    lezec = new Lezec(parts[0], datumNarozeni, double.Parse(parts[2]));
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Chyba při načítání lezců: {ex.Message}");
+                else // Dite
+                {
+                    lezec = new Dite(parts[0], datumNarozeni, double.Parse(parts[2]), parts[3], bool.Parse(parts[4]));
+                }
+
+                string key = $"{lezec.Jmeno}-{lezec.DatumNarozeni:dd.MM.yyyy}";
+
+                if (!lezci.ContainsKey(key))
+                {
+                    lezci.Add(key, lezec);
+                }
             }
         }
         return lezci;
@@ -51,7 +44,6 @@ internal class PraceSeSoubory
     public static void UlozLezce(string lezcifilePath, Dictionary<string, Lezec> lezci)
     {
         List<string> lines = new List<string>();
-
         foreach (var lezec in lezci.Values)
         {
             if (lezec is Dite dite)
@@ -63,7 +55,6 @@ internal class PraceSeSoubory
                 lines.Add($"{lezec.Jmeno};{lezec.DatumNarozeni:dd.MM.yyyy};{lezec.Vyska}");
             }
         }
-
         try
         {
             File.WriteAllLines(lezcifilePath, lines);
@@ -78,32 +69,21 @@ internal class PraceSeSoubory
         Dictionary<string, LezeckaTrasa> trasy = new Dictionary<string, LezeckaTrasa>();
         if (File.Exists(trasyFilePath))
         {
-            try
+            foreach (var line in File.ReadAllLines(trasyFilePath))
             {
-                foreach (var line in File.ReadAllLines(trasyFilePath))
+                var parts = line.Split(';');
+                LezeckaTrasa trasa = new LezeckaTrasa(parts[0], parts[1], (Obtiznost)Enum.Parse(typeof(Obtiznost), parts[2]), double.Parse(parts[3]));
+                if (!trasy.ContainsKey(trasa.Nazev))
                 {
-                    var parts = line.Split(';');
-
-                    LezeckaTrasa trasa = new LezeckaTrasa(parts[0], parts[1], (Obtiznost)Enum.Parse(typeof(Obtiznost), parts[2]), double.Parse(parts[3]));
-
-                    if (!trasy.ContainsKey(trasa.Nazev))
-                    {
-                        trasy.Add(trasa.Nazev, trasa);
-                    }
+                    trasy.Add(trasa.Nazev, trasa);
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Chyba při načítání tras: {ex.Message}");
-            }
         }
-
         return trasy;
     }
     public static void UlozTrasy(string filePath, Dictionary<string, LezeckaTrasa> trasy)
     {
         List<string> lines = new List<string>();
-
         foreach (var trasa in trasy.Values)
         {
             lines.Add($"{trasa.Nazev};{trasa.Autor};{trasa.Obtiznost};{trasa.Delka}");
@@ -137,7 +117,6 @@ internal class PraceSeSoubory
         }
         return pokusy;
     }
-
     public static void UlozPokusy(string filePath, List<LezeckyPokus> pokusy)
     {
         List<string> lines = new List<string>();

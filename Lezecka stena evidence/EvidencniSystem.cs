@@ -10,6 +10,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
+namespace Lezecka_stena_evidence.Data;
 public class EvidencniSystem
 {
     //pomocne metody
@@ -27,7 +28,6 @@ public class EvidencniSystem
                 Console.WriteLine("Musíš zadat jméno nebo příjmení.");
             }
         } while (string.IsNullOrWhiteSpace(krestniJmeno) && string.IsNullOrWhiteSpace(prijmeni));
-
         return $"{krestniJmeno} {prijmeni}".Trim();
     }
     public static string ZiskejJmeno(string prompt)
@@ -48,9 +48,6 @@ public class EvidencniSystem
                 Console.WriteLine("Název trasy je povinný, musiš ho zadat.");
             }
         } while (string.IsNullOrWhiteSpace(nazev));
-
-
-
         string autor;
         do
         {
@@ -61,32 +58,26 @@ public class EvidencniSystem
                 Console.WriteLine("Autor trasy je povinný, musiš ho zadat. Pokud ho neznáš, zadej anonym");
             }
         } while (string.IsNullOrWhiteSpace(autor));
-
         return (nazev, autor);
     }
-
     public static double ZiskejVysku()
     {
         Console.Write("Zadejte výšku lezce (v cm): ");
         double vyska;
         while (!double.TryParse(Console.ReadLine(), out vyska))
         {
-            Console.WriteLine("Neplatný formát výšky. Zadejte prosím znovu:");
+            Console.WriteLine("Neplatný formát výšky. Zadej prosím znovu:");
         }
         return vyska;
     }
-
     public static DateTime ZiskejDatum(string prompt)
-
     {
-
         DateTime datum;
         string vstup;
         do
         {
             Console.Write(prompt);
             vstup = Console.ReadLine();
-
             if (!DateTime.TryParseExact(vstup, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datum))
             {
                 Console.WriteLine("Neplatný formát data. Zadejte prosím znovu (dd.MM.yyyy):");
@@ -94,14 +85,12 @@ public class EvidencniSystem
         } while (!DateTime.TryParseExact(vstup, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out datum));
         return datum;
     }
-
     public static bool ZiskejBool(string prompt)
     {
         Console.Write(prompt);
         string vstup;
         bool hodnota = false;
         bool validniVstup = false;
-
         while (!validniVstup)
         {
             vstup = Console.ReadLine().ToLower();
@@ -129,34 +118,23 @@ public class EvidencniSystem
         string volbaUkonu = Console.ReadLine();
         return volbaUkonu;
     }
-
     //metody pro zadani atributu
     public static (string jmeno, string datumNarozeni, double vyska) ZadejZakladniAtributyLezce()
     {
-
         string jmeno = ZiskejCeleJmeno();
-
-
         DateTime datumNarozeni = ZiskejDatum("Zadejte datum narození lezce (dd.MM.yyyy): ");
         double vyska = ZiskejVysku();
-
         return (jmeno, datumNarozeni.ToString("dd.MM.yyyy"), vyska);
     }
-
     public static (string jmenoZakonnehoZastupce, bool souhlas) ZadejDoplnujiciAtributyLezce()
     {
         string jmenoZakonnehoZastupce = ZiskejJmeno("Zadej jméno zákonného zástupce: ");
-
-
         bool souhlas = ZiskejBool("Existuje Souhlas zákonného zástupce s lezením dítěte? (y/n): ");
-
         return (jmenoZakonnehoZastupce, souhlas);
     }
-
     public static (string nazev, string autor, Obtiznost obtiznost, double delka) ZadejZakladniAtributyTrasy()
     {
         var (nazev, autor) = ZiskejTrasu();
-
         Console.Write("Zadej obtížnost trasy (B4a, B4b, B4c, B5a, B5b, B5c, B6a, B6b, B6c, B7a nebo B7b): ");
         string obtiznostStr = Console.ReadLine();
         Obtiznost obtiznost;
@@ -164,7 +142,6 @@ public class EvidencniSystem
         {
             obtiznost = Obtiznost.neznámá;
         }
-
         Console.Write("Zadej délku trasy (v m): ");
         string delkaStr = Console.ReadLine();
         double delka;
@@ -172,30 +149,22 @@ public class EvidencniSystem
         {
             delka = 0;
         }
-
         return (nazev, autor, obtiznost, delka);
     }
 
     public static (string nazev, string autor, string jmeno, DateTime datumPokusu, bool uspech) ZadejZakladniAtributyPokusu()
     {
         DateTime datumPokusu = ZiskejDatum("Zadej datum lezeckeho pokusu (dd.MM.yyyy): ");
-
         Console.Write("Zadej název trasy: ");
         string nazev = PomocnaTrida.NormalizeText(Console.ReadLine());
-
         Console.Write("Zadej jméno autora trasy: ");
         string autor = PomocnaTrida.NormalizeText(Console.ReadLine());
-
         bool uspech = ZiskejBool("Byl pokus úspěšný? (y/n): ");
-
         string jmeno = ZiskejCeleJmeno();
-
         datumPokusu = datumPokusu.Add(DateTime.Now.TimeOfDay);
-
         return (nazev, autor, jmeno, datumPokusu, uspech);
     }
-
-    /*práce s lezcem*/
+    //práce s lezcem
     public static void PridatLezceZKonzole(Dictionary<string, Lezec> lezci)
     {
         var (jmeno, datumNarozeni, vyska) = ZadejZakladniAtributyLezce();
@@ -223,7 +192,6 @@ public class EvidencniSystem
             Console.WriteLine("Tento lezec už je v systemu zaevidovany.");
         }
     }
-
     public static void EditovatLezce(Dictionary<string, Lezec> lezci)
     {
         string jmeno = ZiskejCeleJmeno();
@@ -256,7 +224,6 @@ public class EvidencniSystem
             Console.WriteLine("Lezec nebyl nalezen.");
         }
     }
-
     public static void SmazatLezce(Dictionary<string, Lezec> lezci)
     {
         string jmeno = ZiskejCeleJmeno();
@@ -281,14 +248,11 @@ public class EvidencniSystem
             Console.WriteLine("Tento lezec v systemu neexistuje.");
         }
     }
-
     /*prace s trasou*/
     public static void PridatTrasuZKonzole(Dictionary<string, LezeckaTrasa> trasy)
     {
         var (nazev, autor, obtiznost, delka) = ZadejZakladniAtributyTrasy();
-
         LezeckaTrasa novaTrasa = new LezeckaTrasa(nazev, autor, obtiznost, delka);
-
         if (!trasy.ContainsKey(nazev))
         {
             trasy.Add(nazev, novaTrasa);
@@ -343,7 +307,6 @@ public class EvidencniSystem
         Console.Write("Zadej název trasy: ");
         string nazev = PomocnaTrida.NormalizeText(Console.ReadLine());
         string key = $"{nazev}";
-
         if (trasy.TryGetValue(key, out LezeckaTrasa trasaKeSmazani))
         {
             Console.WriteLine($"Trasa nalezena: {trasaKeSmazani.Nazev}, Autor: {trasaKeSmazani.Autor}, Obtížnost: {trasaKeSmazani.Obtiznost}, Délka: {trasaKeSmazani.Delka} m");
@@ -353,21 +316,16 @@ public class EvidencniSystem
                 trasy.Remove(key);
                 Console.WriteLine($"Trasa {nazev} byla úspěšně smazána.");
             }
-
             else
             {
                 Console.WriteLine("Trasa nebyla smazána.");
             }
-
         }
         else
         {
             Console.WriteLine("Tato trasa v systemu neexistuje.");
         }
-       
-
     }
-
     /* prace s pokusy*/
     public static void PridatPokusZKonzole(List<LezeckyPokus> pokusy, Dictionary<string, LezeckaTrasa> trasy, Dictionary<string, Lezec> lezci)
     {
@@ -379,7 +337,6 @@ public class EvidencniSystem
         }
         string jmeno = ZiskejCeleJmeno();
         DateTime datumNarozeni = ZiskejDatum("Zadej datum narozeni lezce (dd.MM.yyyy): ");
-
         // Vyhledání lezce podle kombinace jména a data narození
         string lezecKey = $"{jmeno}-{datumNarozeni:dd.MM.yyyy}";
         if (!lezci.ContainsKey(lezecKey))
@@ -401,7 +358,6 @@ public class EvidencniSystem
         pokusy.Add(novyPokus);
         Console.WriteLine("Lezecký pokus úspěšně přidán.");
     }
-
     public static void SmazatPokus(List<LezeckyPokus> pokusy)
     {
         var (nazev, autor, jmeno, datumPokusu, uspech) = ZadejZakladniAtributyPokusu();
