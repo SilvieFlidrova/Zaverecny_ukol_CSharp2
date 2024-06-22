@@ -29,19 +29,17 @@ class Program
         //komunikace suzivatelem
         Console.WriteLine("Vítej v evidenčním systému lezeckých tras a lezců");
         Console.WriteLine("Můžeš editovat seznamy nebo požádat o výpis statistik.");
-
-        bool maBezetProgram = true; //přepsat na do while
-        while (maBezetProgram)
+        string volbaZakladni;
+        do
         {
             Console.WriteLine("Chceš pracovat se záznamy nebo zobrazit statistiku? (1 = záznamy, 2 = statistika, X = konec programu)");
-            string volbaZakladni = Console.ReadLine();
+            volbaZakladni = Console.ReadLine();
 
             switch (volbaZakladni.ToUpper())
             {
                 case "X":
                     Console.WriteLine("Program končí. Vytvořené seznamy najdeš ve složce tohoto programu.");
                     Console.WriteLine("Hezký den a zase někdy příště...");
-                    maBezetProgram = false;
                     break;
                 case "1":
                     managerEvidence.EditaceSeznamu(lezci, trasy, pokusy, lezciFilePath, trasyFilePath, pokusyFilePath);
@@ -53,6 +51,6 @@ class Program
                     Console.WriteLine("Neplatný výběr.");
                     break;
             }
-        }
+        } while (volbaZakladni.ToUpper() != "X");
     }
 }
